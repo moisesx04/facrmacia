@@ -93,7 +93,7 @@ export default function VentasPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
+      <div className="pos-container">
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ position: "relative" }}>

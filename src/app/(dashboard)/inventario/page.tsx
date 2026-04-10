@@ -72,7 +72,7 @@ export default function InventarioPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 24 }}>
+      <div className="inventory-stats">
         <div className="card" style={{ padding: 20 }}>
           <div className="label">Total de Productos</div>
           <div style={{ fontSize: 24, fontWeight: 600 }}>{totalCount}</div>

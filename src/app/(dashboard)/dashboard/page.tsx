@@ -84,14 +84,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Métricas Principales */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
+      <div className="dashboard-metrics">
         <MetricCard title="Ventas Hoy" value={`RD$${stats?.totalHoy.toLocaleString() || "0"}`} loading={loading} />
         <MetricCard title="Facturas Hoy" value={stats?.ventasHoy || "0"} loading={loading} />
         <MetricCard title="Productos en Catálogo" value={stats?.totalProductos || "0"} loading={loading} />
         <MetricCard title="Alertas de Stock" value={stats?.productosStockBajo || "0"} loading={loading} isWarning={Boolean(stats?.productosStockBajo && stats.productosStockBajo > 0)} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: isAdmin ? "350px 1fr" : "1fr", gap: 24 }}>
+      <div className={isAdmin ? "dashboard-panels" : ""}>
         {/* Alertas */}
         {isAdmin && (
           <div className="card" style={{ padding: 24, alignSelf: "start" }}>
