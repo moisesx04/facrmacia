@@ -4,7 +4,8 @@ import { auth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
-  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const db = supabaseAdmin();
   const { searchParams } = new URL(request.url);
@@ -23,9 +24,12 @@ export async function GET(request: NextRequest) {
       .order("stock_actual")
       .limit(limit);
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error)
+      return NextResponse.json({ error: error.message }, { status: 500 });
     // Filtrar en memoria donde stock_actual <= stock_minimo
-    const filtered = (data || []).filter((p) => p.stock_actual <= p.stock_minimo);
+    const filtered = (data || []).filter(
+      (p) => p.stock_actual <= p.stock_minimo,
+    );
     return NextResponse.json(filtered);
   }
 
@@ -44,7 +48,8 @@ export async function GET(request: NextRequest) {
   }
 
   const { data, error } = await dbQuery;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json(data);
 }
@@ -58,8 +63,13 @@ export async function POST(request: NextRequest) {
   const db = supabaseAdmin();
   const body = await request.json();
 
-  const { data, error } = await db.from("productos").insert(body).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  const { data, error } = await db
+    .from("productos")
+    .insert(body)
+    .select()
+    .single();
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 400 });
 
   return NextResponse.json(data, { status: 201 });
 }
@@ -70,19 +80,30 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
-  const db = supabaseAdmin();
-  const body = await request.json();
-  const { id, ...updates } = body;
+  try {
+    const db = supabaseAdmin();
+    const body = await request.json();
+    const { id, categorias, created_at, ...updates } = body;
 
-  const { data, error } = await db
-    .from("productos")
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select()
-    .single();
+    if (!id) return NextResponse.json({ error: "ID faltante" }, { status: 400 });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json(data);
+    const { data, error } = await db
+      .from("productos")
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase Error:", error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json(data);
+  } catch (err: any) {
+    console.error("API Error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: NextRequest) {
@@ -100,6 +121,7 @@ export async function DELETE(request: NextRequest) {
     .update({ activo: false })
     .eq("id", id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error)
+    return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ success: true });
 }
