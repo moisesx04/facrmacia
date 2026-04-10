@@ -37,12 +37,32 @@ export default function InventarioPage() {
 
   async function guardar() {
     setGuardando(true);
-    const method = form.id ? "PUT" : "POST";
-    await fetch("/api/productos", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    setModal(null);
-    setForm(EMPTY);
-    await cargar();
-    setGuardando(false);
+    try {
+      const method = form.id ? "PUT" : "POST";
+      // Limpiar el objeto para enviar solo lo que la DB espera
+      const { categorias, ...saveData } = form as any;
+      
+      const res = await fetch("/api/productos", { 
+        method, 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify(saveData) 
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("Error al guardar:", error);
+        alert("Error al guardar el producto: " + (error.error || "Desconocido"));
+      } else {
+        setModal(null);
+        setForm(EMPTY);
+        await cargar();
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error crítico al guardar");
+    } finally {
+      setGuardando(false);
+    }
   }
 
   async function eliminar(id: string) {
