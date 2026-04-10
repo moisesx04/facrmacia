@@ -157,5 +157,3 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
     </>
   );
 }
-  );
-}
