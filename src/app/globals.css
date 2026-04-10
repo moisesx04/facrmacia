@@ -82,11 +82,12 @@ body {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 24px;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
   border-radius: var(--radius-sm);
   font-family: "Inter", sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   border: none;
@@ -187,10 +188,11 @@ tbody tr:hover {
 
 .main-content {
   flex: 1;
-  padding: 40px;
-  margin-left: 280px; /* Ancho del sidebar */
+  padding: 32px;
+  margin-left: 280px;
   transition: var(--transition);
   max-width: 100%;
+  width: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -204,6 +206,10 @@ tbody tr:hover {
 .sidebar {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-100%);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
 }
 .sidebar.open {
   transform: translateX(0);
@@ -211,6 +217,7 @@ tbody tr:hover {
 @media (min-width: 1025px) {
   .sidebar {
     transform: translateX(0);
+    position: sticky;
   }
 }
 

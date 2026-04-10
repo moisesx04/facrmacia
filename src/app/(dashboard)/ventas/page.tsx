@@ -154,28 +154,26 @@ export default function VentasPage() {
 
   return (
     <div className="fade-in">
-      <div className="page-header" style={{ marginBottom: 40 }}>
+      <div className="page-header" style={{ marginBottom: 24, flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
         <div>
-          <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Punto de Venta</h1>
-          <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>TERMINAL DE FACTURACIÓN RÁPIDA</p>
+          <h1 className="page-title" style={{ fontSize: "clamp(20px, 4vw, 28px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#000" }}>Punto de Venta</h1>
+          <p className="page-subtitle" style={{ fontSize: 10, fontWeight: 700, color: "#64748b" }}>TERMINAL DE FACTURACIÓN RÁPIDA</p>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 32, height: "calc(100vh - 200px)" }}>
-        {/* Panel izquierdo: búsqueda de productos */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 24, minHeight: 0 }}>
-          <div className="glass" style={{ padding: 24, borderRadius: 20 }}>
+      <div style={{ 
+        display: "grid", 
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 400px), 1fr))", 
+        gap: 24,
+        alignItems: "start"
+      }}>
+        {/* Lado Izquierdo: Buscador y Productos */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div className="glass" style={{ padding: 16, borderRadius: 18 }}>
             <div className="search-bar" style={{ maxWidth: "100%" }}>
-              <Search size={22} className="search-icon" color="#6366f1" />
-              <input
-                id="busqueda-producto"
-                className="input"
-                placeholder="BUSCAR MEDICAMENTO O CÓDIGO..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                autoFocus
-                style={{ height: 60, fontSize: 16, paddingLeft: 56, borderRadius: 16, border: "2px solid #eff6ff", background: "#f8fafc" }}
-              />
+              <Search size={18} className="search-icon" color="#6366f1" />
+              <input className="input" placeholder="Buscar medicamento..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
+                style={{ height: 44, fontSize: 13, paddingLeft: 42, borderRadius: 10, border: "2px solid #eff6ff" }} />
             </div>
           </div>
 
@@ -302,10 +300,10 @@ export default function VentasPage() {
 
              {error && <div style={{ background: "#fef2f2", color: "#ef4444", padding: 12, borderRadius: 12, fontSize: 12, fontWeight: 800, textAlign: "center" }}>⚠️ {error.toUpperCase()}</div>}
 
-             <button id="btn-cobrar" className="btn btn-primary" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pagada")} 
-               style={{ height: 64, borderRadius: 20, fontSize: 18, fontWeight: 900, boxShadow: "0 10px 20px -5px rgba(99,102,241,0.4)" }}>
-               {cargando ? "PROCESANDO..." : "✓ COMPLETAR VENTA"}
-             </button>
+             <button id="btn-finalizar" className="btn btn-primary" onClick={() => procesarVenta("pagada")} disabled={cargando || ncfAgotado} 
+              style={{ width: "100%", height: 48, borderRadius: 14, fontSize: 14, fontWeight: 900 }}>
+              {cargando ? "PROCESANDO..." : "✓ COMPLETAR VENTA"}
+            </button>
           </div>
         </div>
       </div>

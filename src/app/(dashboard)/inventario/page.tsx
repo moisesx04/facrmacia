@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Plus, Search, Edit2, Trash2, Upload, Download, X, AlertTriangle } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Upload, Download, X, AlertTriangle, TrendingUp } from "lucide-react";
 
 interface Producto {
   id: string; codigo: string; nombre: string; precio: number; costo: number;
@@ -102,14 +102,14 @@ export default function InventarioPage() {
           <h1 className="page-title" style={{ fontSize: "clamp(24px, 5vw, 32px)", fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Catálogo de Inventario</h1>
           <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>CONTROL DE EXISTENCIAS Y PRECIOS</p>
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", width: "100%", maxWidth: "fit-content" }}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", width: "100%", maxWidth: "fit-content" }}>
           {isAdmin && (
             <>
-              <button id="btn-importar" className="btn btn-ghost" onClick={() => setModal("importar")} style={{ borderRadius: 16, height: 52, padding: "0 20px", flex: 1 }}>
-                <Upload size={18} /> IMPORTAR
+              <button id="btn-importar" className="btn btn-ghost" onClick={() => setModal("importar")} style={{ borderRadius: 12, height: 44, padding: "0 16px", flex: 1 }}>
+                <Upload size={16} /> IMPORTAR
               </button>
-              <button id="btn-nuevo-producto" className="btn btn-primary btn-lg" onClick={() => { setForm(EMPTY); setModal("crear"); }} style={{ borderRadius: 18, padding: "0 24px", height: 52, flex: 1 }}>
-                <Plus size={20} /> NUEVO
+              <button id="btn-nuevo-producto" className="btn btn-primary" onClick={() => { setForm(EMPTY); setModal("crear"); }} style={{ borderRadius: 14, padding: "0 20px", height: 44, flex: 1, fontWeight: 900 }}>
+                <Plus size={18} /> NUEVO
               </button>
             </>
           )}
@@ -120,8 +120,8 @@ export default function InventarioPage() {
         <div className="glass" style={{ padding: 20, borderRadius: 20 }}>
           <div className="search-bar" style={{ maxWidth: "100%" }}>
             <Search size={20} className="search-icon" color="#6366f1" />
-            <input id="buscar-producto" className="input" placeholder="BUSCAR (F1)..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
-              style={{ height: 52, fontSize: 15, paddingLeft: 48, borderRadius: 14, border: "2px solid #eff6ff", background: "#f8fafc" }} />
+            <input id="buscar-producto" className="input" placeholder="Buscar medicamento..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
+              style={{ height: 46, fontSize: 14, paddingLeft: 44, borderRadius: 12, border: "2px solid #eff6ff", background: "#f8fafc" }} />
           </div>
         </div>
         

@@ -50,15 +50,10 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
       <aside className={`sidebar ${isOpen ? "open" : ""}`} style={{ 
         width: 280, 
         height: '100vh',
-        position: 'fixed',
-        left: 0,
-        top: 0,
         background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
         borderRight: "1px solid rgba(255,255,255,0.05)",
         display: 'flex',
         flexDirection: 'column',
-        zIndex: 90,
-        transition: 'transform 0.3s ease'
       }}>
         {/* Header / Logo */}
         <div style={{ padding: "40px 24px", display: "flex", alignItems: "center", gap: 16, borderBottom: "1px solid rgba(255,255,255,0.05)" }}>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import {
   TrendingUp,
   ShoppingBag,
@@ -37,6 +38,7 @@ interface ProductoAlerta {
 
 export default function DashboardPage() {
   const { data: session } = useSession();
+  const router = useRouter();
   const isAdmin = session?.user?.role === "admin";
   const [stats, setStats] = useState<Stats | null>(null);
   const [alertas, setAlertas] = useState<ProductoAlerta[]>([]);
@@ -95,13 +97,9 @@ export default function DashboardPage() {
           <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>INDICADORES CLAVE DE RENDIMIENTO (KPI)</p>
         </div>
         <div style={{ display: "flex", gap: 16 }}>
-          <Link href="/ventas" className="btn btn-primary btn-lg" style={{ 
-            borderRadius: 20, padding: "0 32px", fontSize: 15, fontWeight: 900,
-            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-            boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)"
-          }}>
-            <ShoppingBag size={20} /> REALIZAR VENTA
-          </Link>
+          <button className="btn btn-primary" onClick={() => router.push("/ventas")} style={{ height: 44, padding: "0 20px", borderRadius: 14, display: "flex", alignItems: "center", gap: 8, fontWeight: 900 }}>
+            <ShoppingBag size={18} /> REALIZAR VENTA
+          </button>
         </div>
       </div>
 
@@ -194,7 +192,7 @@ export default function DashboardPage() {
                 onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = "translateY(-12px)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; e.currentTarget.style.borderColor = item.color; }}
                 onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
               >
-                <div style={{ width: 72, height: 72, background: item.bg, color: item.color, borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 8px 16px -4px ${item.color}33` }}>
+                <div style={{ width: 60, height: 60, background: item.bg, color: item.color, borderRadius: 18, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 12px -3px ${item.color}33` }}>
                   {item.icon}
                 </div>
                 <div style={{ textAlign: "center" }}>
