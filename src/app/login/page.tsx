@@ -49,12 +49,12 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <div>
-              <label className="label" htmlFor="email">Correo Electrónico</label>
+              <label className="label" htmlFor="email">Usuario</label>
               <input
                 id="email"
-                type="email"
+                type="text"
                 className="input"
-                placeholder="admin@farmasystem.com"
+                placeholder="admin"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

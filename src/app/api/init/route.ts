@@ -8,49 +8,42 @@ export async function POST() {
   try {
     const db = supabaseAdmin();
 
-    // Verificar si ya hay usuarios
-    const { count } = await db
-      .from("usuarios")
-      .select("*", { count: "exact", head: true });
-
-    if (count && count > 0) {
-      return NextResponse.json(
-        { error: "El sistema ya está inicializado" },
-        { status: 409 }
-      );
-    }
-
-    const adminPassword = "Admin2025!";
-    const vendedorPassword = "Vendedor2025!";
+    const adminUser = "admin";
+    const adminPassword = "admin1234@";
+    const vendedorUser = "ventas";
+    const vendedorPassword = "vendedor1234@";
 
     const adminHash = await bcrypt.hash(adminPassword, 12);
     const vendedorHash = await bcrypt.hash(vendedorPassword, 12);
 
-    await db.from("usuarios").insert([
-      {
-        nombre: "Administrador",
-        email: "admin@farmasystem.com",
-        password_hash: adminHash,
-        rol: "admin",
-      },
-      {
-        nombre: "Vendedor",
-        email: "ventas@farmasystem.com",
-        password_hash: vendedorHash,
-        rol: "vendedor",
-      },
-    ]);
+    // Upsert admin
+    await db.from("usuarios").upsert({
+      nombre: "Administrador",
+      email: adminUser,
+      password_hash: adminHash,
+      rol: "admin",
+      activo: true
+    }, { onConflict: 'email' });
+
+    // Upsert vendedor
+    await db.from("usuarios").upsert({
+      nombre: "Vendedor",
+      email: vendedorUser,
+      password_hash: vendedorHash,
+      rol: "vendedor",
+      activo: true
+    }, { onConflict: 'email' });
 
     return NextResponse.json({
-      message: "✅ Sistema inicializado correctamente",
+      message: "✅ Credenciales actualizadas correctamente",
       credenciales: [
-        { email: "admin@farmasystem.com", password: adminPassword, rol: "admin" },
-        { email: "ventas@farmasystem.com", password: vendedorPassword, rol: "vendedor" },
+        { usuario: adminUser, password: adminPassword, rol: "admin" },
+        { usuario: vendedorUser, password: vendedorPassword, rol: "vendedor" },
       ],
-      aviso: "⚠️ Cambia estas contraseñas inmediatamente después del primer login.",
+      aviso: "⚠️ Prueba iniciar sesión ahora con estos datos.",
     });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Error al inicializar" }, { status: 500 });
+    return NextResponse.json({ error: "Error al actualizar credenciales" }, { status: 500 });
   }
 }
