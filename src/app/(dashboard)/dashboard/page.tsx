@@ -75,9 +75,8 @@ export default function DashboardPage() {
         </a>
       </div>
 
-      {/* KPI Cards */}
       {isAdmin ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, marginBottom: 32 }}>
+        <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, marginBottom: 32 }}>
           <StatCard loading={loading} icon={<DollarSign size={22} color="#ffffff" />} iconBg="#000000"
             value={`RD$${stats?.totalHoy.toLocaleString("es-DO", { minimumFractionDigits: 2 }) || "0.00"}`}
             label="VENTAS DE HOY" accent="#000000" />

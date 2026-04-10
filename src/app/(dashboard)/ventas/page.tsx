@@ -155,23 +155,24 @@ export default function VentasPage() {
 
       <div className="pos-layout">
         {/* Panel izquierdo: búsqueda de productos */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minHeight: 0 }}>
-          <div className="glass" style={{ padding: 20 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, minHeight: 0, flex: 1 }}>
+          <div style={{ padding: 16, background: "white", border: "2px solid #000000" }}>
             <div className="search-bar" style={{ maxWidth: "100%" }}>
               <Search size={16} className="search-icon" />
               <input
                 id="busqueda-producto"
                 className="input"
-                placeholder="Buscar por nombre o código de barras..."
+                placeholder="BUSCAR PRODUCTO..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 autoFocus
+                style={{ borderRadius: 0, border: "2px solid #000000", height: 48, fontWeight: 700 }}
               />
             </div>
           </div>
 
-          <div className="glass" style={{ flex: 1, overflow: "auto", padding: 0 }}>
-            <div className="table-container">
+          <div style={{ flex: 1, overflow: "hidden", border: "2px solid #000000", background: "white" }}>
+            <div className="table-container" style={{ maxHeight: "calc(100vh - 350px)", overflowY: "auto" }}>
               <table>
                 <thead>
                   <tr>
@@ -211,36 +212,35 @@ export default function VentasPage() {
         </div>
 
         {/* Panel derecho: carrito */}
-        <div className="glass" style={{ display: "flex", flexDirection: "column", padding: 20, gap: 16, overflow: "auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", padding: 20, gap: 16, border: "2px solid #000000", background: "white", overflow: "visible" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <ShoppingCart size={18} color="var(--accent-light)" />
-            <h2 style={{ fontSize: 16, fontWeight: 700 }}>Carrito</h2>
-            <span className="badge badge-purple" style={{ marginLeft: "auto" }}>{cart.length} items</span>
+            <div style={{ background: "black", color: "white", padding: "6px 12px", fontSize: 13, fontWeight: 800 }}>CARRITO</div>
+            <span className="badge badge-purple" style={{ marginLeft: "auto", background: "black", color: "white", border: "1px solid black" }}>{cart.length} ITEMS</span>
           </div>
 
           {/* Items del carrito */}
-          <div style={{ flex: 1, overflow: "auto", minHeight: 100 }}>
+          <div style={{ flex: 1, overflowY: "auto", minHeight: 150, maxHeight: 400 }}>
             {cart.length === 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 120, color: "var(--text-muted)", gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 120, color: "#94a3b8", gap: 8, border: "1px dashed #cbd5e1" }}>
                 <ShoppingCart size={32} />
-                <span style={{ fontSize: 13 }}>Carrito vacío</span>
+                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase" }}>Carrito Vacío</span>
               </div>
             ) : cart.map((item) => (
-              <div key={item.id} className="cart-item">
+              <div key={item.id} className="cart-item" style={{ borderBottom: "1.5px solid #e2e8f0" }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.nombre}</div>
-                  <div style={{ fontSize: 12, color: "var(--text-secondary)" }}>RD${item.precio.toFixed(2)}/u</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "uppercase" }}>{item.nombre}</div>
+                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>RD${item.precio.toFixed(2)}/U</div>
                 </div>
-                <div className="qty-control">
-                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, -1)}><Minus size={12} /></button>
-                  <span style={{ fontSize: 14, fontWeight: 700, minWidth: 24, textAlign: "center" }}>{item.cantidad}</span>
-                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, 1)}><Plus size={12} /></button>
+                <div className="qty-control" style={{ background: "#f8fafc", padding: "4px" }}>
+                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, -1)} style={{ width: 36, height: 36, fontSize: 18 }}>-</button>
+                  <span style={{ fontSize: 15, fontWeight: 900, minWidth: 28, textAlign: "center" }}>{item.cantidad}</span>
+                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, 1)} style={{ width: 36, height: 36, fontSize: 18 }}>+</button>
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--success)", minWidth: 70, textAlign: "right" }}>
+                <div style={{ fontSize: 14, fontWeight: 900, color: "#000000", minWidth: 80, textAlign: "right" }}>
                   RD${(item.precio * item.cantidad).toFixed(2)}
                 </div>
-                <button className="btn btn-ghost btn-icon" onClick={() => removeItem(item.id)} style={{ padding: 6 }}>
-                  <Trash2 size={14} color="var(--danger)" />
+                <button className="btn btn-ghost btn-icon" onClick={() => removeItem(item.id)} style={{ padding: 10, background: "#fff1f2", border: "1px solid #fda4af", borderRadius: 0 }}>
+                  <Trash2 size={16} color="#e11d48" />
                 </button>
               </div>
             ))}

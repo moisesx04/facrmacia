@@ -151,7 +151,7 @@ export default function InventarioPage() {
               <h2>{modal === "crear" ? "Nuevo Producto" : "Editar Producto"}</h2>
               <button className="btn btn-ghost btn-icon" onClick={() => setModal(null)}><X size={18} /></button>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
               {[
                 { label: "Código", key: "codigo", type: "text" },
                 { label: "Nombre", key: "nombre", type: "text" },
@@ -161,15 +161,16 @@ export default function InventarioPage() {
                 { label: "Stock Mínimo", key: "stock_minimo", type: "number" },
               ].map(({ label, key, type }) => (
                 <div key={key}>
-                  <label className="label">{label}</label>
+                  <label className="label" style={{ fontSize: 11, fontWeight: 800 }}>{label}</label>
                   <input className="input" type={type} value={String(form[key as keyof Producto] || "")}
-                    onChange={(e) => setForm((f) => ({ ...f, [key]: type === "number" ? parseFloat(e.target.value) || 0 : e.target.value }))} />
+                    onChange={(e) => setForm((f) => ({ ...f, [key]: type === "number" ? parseFloat(e.target.value) || 0 : e.target.value }))}
+                    style={{ borderRadius: 0, border: "2px solid #000000" }} />
                 </div>
               ))}
-              <div style={{ gridColumn: "span 2" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 14 }}>
-                  <input type="checkbox" checked={form.aplica_itbis ?? true} onChange={(e) => setForm((f) => ({ ...f, aplica_itbis: e.target.checked }))} style={{ width: 16, height: 16, accentColor: "var(--accent)" }} />
-                  Aplica ITBIS (18%)
+              <div style={{ gridColumn: "1 / -1" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, background: "#f8fafc", padding: "12px", border: "1px solid #000000" }}>
+                  <input type="checkbox" checked={form.aplica_itbis ?? true} onChange={(e) => setForm((f) => ({ ...f, aplica_itbis: e.target.checked }))} style={{ width: 20, height: 20, accentColor: "#000000" }} />
+                  APLICAR ITBIS (18%)
                 </label>
               </div>
             </div>

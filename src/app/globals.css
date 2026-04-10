@@ -305,8 +305,8 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
 @media (max-width: 768px) {
   .main-content { 
     margin-left: 0; 
-    padding: 16px;
-    padding-top: 72px; /* Espacio para el botón de menú */
+    padding: 12px;
+    padding-top: 72px; 
   }
   .sidebar { 
     transform: translateX(-100%); 
@@ -318,36 +318,44 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
   .mobile-nav-toggle {
     display: flex;
   }
+  
+  /* Tables */
+  .table-container {
+    margin: 0 -12px;
+    padding: 0 12px;
+    width: calc(100% + 24px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { min-width: 500px; }
+
+  /* Grid adjustment for KPI Cards */
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* ============================================================
    STATS / KPI CARDS
    ============================================================ */
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  border: 2px solid #000000;
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
   transition: var(--transition);
 }
-.stat-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, transparent 60%, rgba(255,255,255,0.02));
-  pointer-events: none;
-}
-.stat-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0px #000000; }
 .stat-icon {
-  width: 48px; height: 48px;
+  width: 44px; height: 44px;
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
-.stat-value { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
-.stat-label { font-size: 13px; color: var(--text-secondary); }
+.stat-value { font-size: 24px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 11px; color: var(--text-secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
 
 /* ============================================================
    PAGE HEADERS
@@ -382,16 +390,36 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
 }
 
 /* ============================================================
-   POS / CART
+   POS / CART RESPONSIVENESS
    ============================================================ */
-.pos-layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; height: calc(100vh - var(--header-height) - 48px); }
-@media (max-width: 1100px) { .pos-layout { grid-template-columns: 1fr; } }
+.pos-layout { 
+  display: grid; 
+  grid-template-columns: 1fr 380px; 
+  gap: 20px; 
+  height: calc(100vh - var(--header-height) - 48px); 
+}
+
+@media (max-width: 1200px) {
+  .pos-layout { grid-template-columns: 1fr 320px; }
+}
+
+@media (max-width: 900px) {
+  .pos-layout { 
+    grid-template-columns: 1fr; 
+    height: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Carrito abajo para Prioridad de búsqueda */
+  }
+  .pos-layout > div {
+    max-height: none !important;
+  }
+}
 
 .cart-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .cart-item:last-child { border-bottom: none; }
-.qty-control { display: flex; align-items: center; gap: 8px; }
-.qty-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: var(--transition); }
-.qty-btn:hover { background: var(--accent); border-color: var(--accent); }
+.qty-control { display: flex; align-items: center; gap: 4px; }
+.qty-btn { width: 32px; height: 32px; border-radius: 0; border: 1.5px solid #000000; background: #ffffff; color: #000000; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; transition: var(--transition); }
+.qty-btn:hover { background: #000000; color: #ffffff; }
 
 /* ============================================================
    STOCK ALERT
@@ -418,10 +446,9 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
 /* ============================================================
    SCROLLBAR
    ============================================================ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 100px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar-thumb { background: #000000; }
 
 /* ============================================================
    MISC UTILITIES
