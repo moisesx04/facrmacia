@@ -4,37 +4,37 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
-  --bg-primary: #000000;
-  --bg-secondary: #050505;
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-card-hover: rgba(255, 255, 255, 0.06);
-  --border: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.2);
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-card: rgba(0, 0, 0, 0.01);
+  --bg-card-hover: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.1);
+  --border-hover: rgba(0, 0, 0, 0.2);
 
-  --accent: #ffffff;
-  --accent-light: #f1f5f9;
-  --accent-dark: #cbd5e1;
-  --accent-glow: rgba(255, 255, 255, 0.15);
+  --accent: #000000;
+  --accent-light: #334155;
+  --accent-dark: #000000;
+  --accent-glow: rgba(0, 0, 0, 0.05);
 
-  --success: #e2e8f0;
-  --success-glow: rgba(255, 255, 255, 0.1);
-  --warning: #94a3b8;
-  --warning-glow: rgba(255, 255, 255, 0.08);
-  --danger: #ffffff;
-  --danger-glow: rgba(255, 255, 255, 0.2);
-  --info: #cbd5e1;
+  --success: #000000;
+  --success-glow: rgba(0, 0, 0, 0.05);
+  --warning: #475569;
+  --warning-glow: rgba(0, 0, 0, 0.03);
+  --danger: #000000;
+  --danger-glow: rgba(0, 0, 0, 0.1);
+  --info: #64748b;
 
-  --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
+  --text-primary: #000000;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
   --sidebar-width: 260px;
   --header-height: 64px;
-  --radius: 0px; /* Squared for a more industrial B/W look */
+  --radius: 0px; 
   --radius-sm: 0px;
   --radius-lg: 0px;
-  --shadow: 0 4px 0px rgba(255, 255, 255, 0.1);
-  --shadow-lg: 0 8px 0px rgba(255, 255, 255, 0.15);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.08);
   --transition: all 0.15s ease-in-out;
 }
 

@@ -56,29 +56,29 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
       )}
 
       <aside className={`sidebar ${isOpen ? "open" : ""}`} style={{
-        background: "var(--bg-secondary)",
-        borderRight: "1px solid var(--border)",
+        background: "var(--bg-primary)",
+        borderRight: "2px solid #000000",
       }}>
         {/* Logo */}
-        <div style={{ padding: "24px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: "24px 20px", borderBottom: "2px solid #000000", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
               width: 40, height: 40, borderRadius: 0,
-              background: "var(--accent)",
+              background: "#000000",
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 0 0 1px var(--accent)", flexShrink: 0
+              flexShrink: 0
             }}>
-              <Pill size={20} color="black" />
+              <Pill size={20} color="white" />
             </div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.5px", color: "var(--text-primary)" }}>FARMASYSTEM</div>
-              <div style={{ fontSize: 10, color: "var(--text-secondary)", fontWeight: 700, letterSpacing: "1px" }}>PRO CORE</div>
+              <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.5px", color: "#000000" }}>FARMASYSTEM</div>
+              <div style={{ fontSize: 10, color: "#64748b", fontWeight: 700, letterSpacing: "1px" }}>PRO CORE</div>
             </div>
           </div>
           
           <button 
             onClick={() => setIsOpen(false)}
-            style={{ background: "transparent", border: "none", color: "var(--text-secondary)", cursor: "pointer", display: "inline-flex" }}
+            style={{ background: "transparent", border: "none", color: "#000000", cursor: "pointer", display: "inline-flex" }}
             className="md-hidden"
           >
             <X size={20} />
@@ -99,16 +99,16 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
                       display: "flex", alignItems: "center", gap: 12,
                       padding: "12px 14px", borderRadius: 0,
                       textDecoration: "none",
-                      color: active ? "var(--bg-primary)" : "var(--text-secondary)",
-                      background: active ? "var(--accent)" : "transparent",
+                      color: active ? "#ffffff" : "#000000",
+                      background: active ? "#000000" : "transparent",
                       fontWeight: active ? 700 : 500,
                       fontSize: 14,
                       transition: "var(--transition)",
                       position: "relative",
-                      border: active ? "none" : "1px solid transparent",
+                      border: "1px solid transparent",
                     }}
-                    onMouseEnter={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "var(--bg-card)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; } }}
-                    onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; (e.currentTarget as HTMLElement).style.borderColor = "transparent"; } }}
+                    onMouseEnter={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "#f1f5f9"; (e.currentTarget as HTMLElement).style.borderColor = "#000000"; } }}
+                    onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.borderColor = "transparent"; } }}
                   >
                     <Icon size={18} />
                     <span style={{ flex: 1, textTransform: "uppercase", letterSpacing: "0.5px" }}>{item.label}</span>
@@ -121,25 +121,25 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
         </nav>
 
         {/* User + Logout */}
-        <div style={{ padding: "16px 12px", borderTop: "1px solid var(--border)" }}>
-          <div style={{ padding: "14px", border: "1px solid var(--border)", marginBottom: 8, background: "var(--bg-card)" }}>
+        <div style={{ padding: "16px 12px", borderTop: "2px solid #000000" }}>
+          <div style={{ padding: "14px", border: "1px solid #000000", marginBottom: 8, background: "#f8fafc" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{
                 width: 36, height: 36, borderRadius: 0,
-                background: "var(--accent)",
-                color: "var(--bg-primary)",
+                background: "#000000",
+                color: "#ffffff",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 14, fontWeight: 800, flexShrink: 0,
               }}>
                 {userName?.charAt(0).toUpperCase()}
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "uppercase" }}>{userName}</div>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "uppercase", color: "#000000" }}>{userName}</div>
+                <div style={{ fontSize: 11, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail}</div>
               </div>
             </div>
             <div style={{ marginTop: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", padding: "2px 6px", border: "1px solid var(--border)", color: "var(--text-primary)" }}>
+              <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", padding: "2px 6px", border: "1px solid #000000", color: "#000000" }}>
                 {role === "admin" ? "ADMINISTRADOR" : "VENDEDOR"}
               </span>
             </div>
@@ -148,7 +148,7 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
             id="btn-logout"
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="btn btn-ghost w-full"
-            style={{ justifyContent: "center", gap: 8, borderRadius: 0, border: "1px solid var(--border)", textTransform: "uppercase", fontSize: 12, fontWeight: 700 }}
+            style={{ justifyContent: "center", gap: 8, borderRadius: 0, border: "2px solid #000000", textTransform: "uppercase", fontSize: 12, fontWeight: 700, color: "#000000" }}
           >
             <LogOut size={16} /> Cerrar Sesión
           </button>
