@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     .from("facturas")
     .select(`id, ncf, ncf_tipo, subtotal, itbis_total, descuento, total, metodo_pago, estado, created_at,
       clientes(nombre, cedula_rnc),
-      usuarios(nombre),
+      usuarios!usuario_id(nombre),
       factura_items(cantidad, precio_unitario, subtotal, productos(nombre, codigo))`)
     .gte("created_at", desde)
     .lte("created_at", hasta + "T23:59:59")

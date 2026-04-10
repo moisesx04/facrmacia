@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   let query = db
     .from("facturas")
-    .select(`*, clientes(nombre, cedula_rnc), usuarios(nombre), factura_items(*, productos(nombre, codigo))`)
+    .select(`*, clientes(nombre, cedula_rnc), usuarios!usuario_id(nombre), factura_items(*, productos(nombre, codigo))`)
     .order("created_at", { ascending: false })
     .limit(limit);
 
