@@ -62,8 +62,8 @@ export default function ReportesPage() {
         </button>
       </div>
 
-      {/* Filtros Glass */}
-      <div className="glass" style={{ padding: 32, borderRadius: 24, marginBottom: 32, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-end" }}>
+      {/* Filtros */}
+      <div className="card" style={{ padding: 32, marginBottom: 32, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-end" }}>
         <div>
           <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>FECHA INICIAL</label>
           <input className="input" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} 
@@ -81,9 +81,8 @@ export default function ReportesPage() {
 
       {resumen && (
         <>
-          {/* KPIs Glow */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 24, marginBottom: 40 }}>
-            <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #10b981" }}>
+            <div className="card" style={{ padding: 24 }}>
               <div style={{ width: 48, height: 48, background: "#f0fdf4", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                 <DollarSign size={24} color="#10b981" />
               </div>
@@ -93,7 +92,7 @@ export default function ReportesPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Total Ventas Brutas</div>
             </div>
 
-            <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #6366f1" }}>
+            <div className="card" style={{ padding: 24 }}>
               <div style={{ width: 48, height: 48, background: "#f5f3ff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                 <FileText size={24} color="#6366f1" />
               </div>
@@ -101,7 +100,7 @@ export default function ReportesPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Comprobantes Emitidos</div>
             </div>
 
-            <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #f59e0b" }}>
+            <div className="card" style={{ padding: 24 }}>
               <div style={{ width: 48, height: 48, background: "#fffbeb", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                 <TrendingUp size={24} color="#f59e0b" />
               </div>
@@ -111,7 +110,7 @@ export default function ReportesPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Ticket Promedio</div>
             </div>
 
-            <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #3b82f6" }}>
+            <div className="card" style={{ padding: 24 }}>
               <div style={{ width: 48, height: 48, background: "#eff6ff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
                 <Percent size={24} color="#3b82f6" />
               </div>
@@ -124,8 +123,8 @@ export default function ReportesPage() {
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 450px), 1fr))", gap: 32 }}>
             {/* Por método de pago */}
-            <div className="glass" style={{ padding: "clamp(24px, 5vw, 40px)", borderRadius: 28 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", marginBottom: 32, letterSpacing: "-0.02em" }}>Desglose por Método de Pago</h3>
+            <div className="card" style={{ padding: 32 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 32 }}>Desglose por Método de Pago</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 {Object.entries(resumen.por_metodo_pago || {}).map(([metodo, monto]) => {
                   const pct = resumen.total_ventas > 0 ? (monto / resumen.total_ventas) * 100 : 0;
@@ -152,17 +151,17 @@ export default function ReportesPage() {
             </div>
 
             {/* Resumen Informativo */}
-            <div className="glass" style={{ padding: "clamp(24px, 5vw, 40px)", borderRadius: 28, background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", color: "white" }}>
-              <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 32 }}>Información del Período</h3>
-              <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.6, fontSize: 14 }}>
+            <div className="card" style={{ padding: 32, background: "#f8fafc" }}>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-main)", marginBottom: 24 }}>Información del Período</h3>
+              <p style={{ color: "var(--text-muted)", lineHeight: 1.6, fontSize: 14 }}>
                 Este reporte comprende el intervalo del **{format(new Date(desde), "dd 'de' MMMM", { locale: es })}** al **{format(new Date(hasta), "dd 'de' MMMM", { locale: es })}**.
                 <br /><br />
                 Durante este tiempo se han procesado **{resumen.total_facturas}** transacciones legítimas. El ITBIS total acumulado por el fisco asciende a **RD${resumen.total_itbis.toLocaleString()}**.
               </p>
-              <div style={{ marginTop: 40, padding: 24, background: "rgba(255,255,255,0.05)", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)" }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: 16, letterSpacing: "0.1em" }}>RENDIMIENTO PROMEDIO</div>
-                <div style={{ fontSize: "clamp(24px, 4vw, 32px)", fontWeight: 900 }}>RD${(resumen.total_ventas / 30).toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: "#10b981", fontWeight: 700, marginTop: 4 }}>↑ 12% COMPARADO CON MES ANTERIOR</div>
+              <div style={{ marginTop: 32, padding: 20, background: "white", borderRadius: 8, border: "1px solid var(--border)" }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, letterSpacing: "0.05em" }}>RENDIMIENTO PROMEDIO</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)" }}>RD${(resumen.total_ventas / 30).toLocaleString()}</div>
+                <div style={{ fontSize: 12, color: "var(--success)", fontWeight: 500, marginTop: 4 }}>↑ 12% COMPARADO CON MES ANTERIOR</div>
               </div>
             </div>
           </div>

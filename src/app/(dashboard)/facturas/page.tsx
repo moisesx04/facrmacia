@@ -85,44 +85,41 @@ export default function FacturasPage() {
         </div>
       </div>
 
-      {/* Filtros Glassmorphism */}
-      <div className="glass" style={{ padding: 32, borderRadius: 24, marginBottom: 32, display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-end" }}>
+      {/* Filtros */}
+      <div className="card" style={{ padding: 24, marginBottom: 24, display: "flex", flexWrap: "wrap", gap: 16, alignItems: "flex-end" }}>
         <div style={{ flex: "2 1 300px" }}>
-          <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>BUSCAR NCF O CLIENTE</label>
-          <div className="search-bar" style={{ maxWidth: "100%" }}>
-            <Search size={22} className="search-icon" color="#6366f1" />
-            <input id="buscar-factura" className="input" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Ej: B0200000001..." 
-              style={{ height: 56, fontSize: 15, paddingLeft: 56, borderRadius: 14, border: "2px solid #eff6ff", background: "#f8fafc" }} />
+          <label className="label" style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>BUSCAR NCF O CLIENTE</label>
+          <div style={{ position: "relative" }}>
+            <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+            <input className="input" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Ej: B0200000001..." 
+              style={{ paddingLeft: 44 }} />
           </div>
         </div>
         <div style={{ flex: "1 1 160px" }}>
-          <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>FECHA INICIAL</label>
-          <input className="input" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} 
-            style={{ height: 56, borderRadius: 14, border: "2px solid #eff6ff", background: "#f8fafc", fontWeight: 700 }} />
+          <label className="label" style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>FECHA INICIAL</label>
+          <input className="input" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
         </div>
         <div style={{ flex: "1 1 160px" }}>
-          <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>FECHA FINAL</label>
-          <input className="input" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} 
-            style={{ height: 56, borderRadius: 14, border: "2px solid #eff6ff", background: "#f8fafc", fontWeight: 700 }} />
+          <label className="label" style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>FECHA FINAL</label>
+          <input className="input" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
         </div>
         <div style={{ flex: "1 1 160px" }}>
-          <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>ESTADO</label>
-          <select id="filter-estado" className="select" value={estado} onChange={(e) => setEstado(e.target.value)}
-            style={{ height: 56, borderRadius: 14, border: "2px solid #eff6ff", background: "#f8fafc", fontWeight: 700 }}>
-            <option value="">Todos los Estados</option>
+          <label className="label" style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 8 }}>ESTADO</label>
+          <select className="select" value={estado} onChange={(e) => setEstado(e.target.value)}>
+            <option value="">Todos</option>
             <option value="pagada">Pagada</option>
             <option value="pendiente">Pendiente</option>
             <option value="anulada">Anulada</option>
           </select>
         </div>
-        <button className="btn btn-primary" onClick={cargar} style={{ height: 56, borderRadius: 16, padding: "0 32px", fontSize: 14 }}>
+        <button className="btn btn-primary" onClick={cargar}>
           FILTRAR RESULTADOS
         </button>
       </div>
 
-      <div className="glass" style={{ borderRadius: 24, overflow: "hidden" }}>
-        <div className="table-container" style={{ border: "none" }}>
-          <table>
+      <div className="card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="datagrid">
             <thead>
               <tr>
                 <th style={{ padding: "16px 32px" }}>NÚMERO NCF</th>
@@ -164,12 +161,12 @@ export default function FacturasPage() {
                   </td>
                   <td style={{ padding: "20px 32px", textAlign: "right" }}>
                     <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setFacturaView(f)} style={{ background: "#eff6ff", borderRadius: 10, padding: 10 }}>
-                        <ChevronDown size={16} color="#3b82f6" />
+                      <button className="btn btn-ghost" style={{ padding: "6px" }} onClick={() => setFacturaView(f)}>
+                        <ChevronDown size={16} />
                       </button>
                       {isAdmin && f.estado !== "anulada" && (
-                        <button className="btn btn-ghost btn-sm" onClick={() => anular(f.id)} style={{ background: "#fef2f2", borderRadius: 10, padding: 10 }}>
-                          <XCircle size={16} color="#ef4444" />
+                        <button className="btn btn-ghost" style={{ padding: "6px", color: "var(--danger)" }} onClick={() => anular(f.id)}>
+                          <XCircle size={16} />
                         </button>
                       )}
                     </div>
@@ -194,17 +191,15 @@ export default function FacturasPage() {
             </div>
             
             <div style={{ display: "flex", gap: 16, marginBottom: 32 }}>
-              <button className="btn btn-primary" onClick={() => { setModoPrint("a4"); setTimeout(handlePrint, 100); }} 
-                style={{ flex: 1, height: 56, borderRadius: 16 }}>
-                <Printer size={20} /> IMPRIMIR FORMATO A4
+              <button className="btn btn-primary" onClick={() => { setModoPrint("a4"); setTimeout(handlePrint, 100); }} style={{ flex: 1 }}>
+                <Printer size={16} /> IMPRIMIR FORMATO A4
               </button>
-              <button className="btn btn-ghost" onClick={() => { setModoPrint("termica"); setTimeout(handlePrint, 100); }} 
-                style={{ flex: 1, height: 56, borderRadius: 16, border: "2px solid #eff6ff" }}>
-                <Printer size={20} /> TICKET TÉRMICO (80MM)
+              <button className="btn btn-outline" onClick={() => { setModoPrint("termica"); setTimeout(handlePrint, 100); }} style={{ flex: 1 }}>
+                <Printer size={16} /> TICKET TÉRMICO (80MM)
               </button>
             </div>
 
-            <div className="glass" style={{ background: "#f1f5f9", borderRadius: 24, padding: "40px", overflow: "auto", maxHeight: 500, border: "2px solid #eff6ff" }}>
+            <div className="card" style={{ background: "#f8fafc", padding: "40px", overflow: "auto", maxHeight: 500 }}>
               <PrintInvoice ref={printRef} data={toInvoiceData(facturaView)} modo={modoPrint} />
             </div>
           </div>

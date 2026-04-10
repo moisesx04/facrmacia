@@ -82,7 +82,7 @@ export default function ConfiguracionPage() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-        <div className="glass" style={{ padding: 32, borderRadius: 32 }}>
+        <div className="card" style={{ padding: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 40 }}>
              <div style={{ width: 48, height: 48, background: "rgba(99, 102, 241, 0.1)", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
                <Settings size={24} color="#6366f1" />
@@ -102,11 +102,10 @@ export default function ConfiguracionPage() {
               const critico = disponibles < 100;
               
               return (
-                <div key={seq.id} className="hover-lift" style={{
-                  padding: "24px 32px", borderRadius: 24, border: agotado ? "2px solid #fee2e2" : "1px solid #f1f5f9",
-                  background: agotado ? "linear-gradient(to right, #fff1f2, #fff)" : "white",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)",
-                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap"
+                <div key={seq.id} className="card" style={{
+                  padding: "24px 32px", border: agotado ? "1px solid var(--danger)" : "1px solid var(--border)",
+                  background: agotado ? "#fef2f2" : "white",
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap", marginBottom: 16
                 }}>
                     <div style={{ display: "flex", gap: 24, alignItems: "center", flex: 1, minWidth: 300 }}>
                       <div style={{ 
@@ -120,9 +119,9 @@ export default function ConfiguracionPage() {
                         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
                           <span style={{ fontSize: 18, fontWeight: 950, color: "#0f172a", letterSpacing: "-0.02em" }}>{NCF_NOMBRES[seq.tipo] || seq.tipo}</span>
                           {agotado ? (
-                            <span style={{ background: "#ef4444", color: "white", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 950 }}>AGOTADO</span>
+                            <span className="badge badge-danger">AGOTADO</span>
                           ) : critico && (
-                            <span style={{ background: "#f59e0b", color: "white", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 950 }}>BAJO CONTROL</span>
+                            <span className="badge badge-warning">BAJO CONTROL</span>
                           )}
                         </div>
                         <div style={{ display: "flex", gap: 24 }}>
@@ -186,7 +185,7 @@ export default function ConfiguracionPage() {
         )}
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, marginBottom: 40 }}>
-           <div className="glass hover-lift" style={{ padding: 28, borderRadius: 24, borderLeft: "8px solid var(--primary)" }}>
+           <div className="card" style={{ padding: 28, borderLeft: "4px solid var(--primary)" }}>
               <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
                  <div style={{ width: 32, height: 32, background: "rgba(99, 102, 241, 0.1)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                    <FileCheck size={18} color="var(--primary)" />
@@ -198,7 +197,7 @@ export default function ConfiguracionPage() {
               </p>
            </div>
            
-           <div className="glass hover-lift" style={{ padding: 28, borderRadius: 24, borderLeft: "8px solid var(--success)" }}>
+           <div className="card" style={{ padding: 28, borderLeft: "4px solid var(--success)" }}>
               <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
                  <div style={{ width: 32, height: 32, background: "rgba(16, 185, 129, 0.1)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
                    <Hash size={18} color="var(--success)" />

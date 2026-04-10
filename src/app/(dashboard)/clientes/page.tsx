@@ -48,22 +48,22 @@ export default function ClientesPage() {
           <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Gestión de Clientes</h1>
           <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>DIRECTORIO INTEGRAL DE PACIENTES Y ENTIDADES</p>
         </div>
-        <button id="btn-nuevo-cliente" className="btn btn-primary btn-lg" onClick={() => { setForm(EMPTY); setModal("crear"); }} style={{ borderRadius: 18, padding: "0 32px" }}>
-          <Plus size={20} /> NUEVO CLIENTE
+        <button className="btn btn-primary" onClick={() => { setForm(EMPTY); setModal("crear"); }}>
+          <Plus size={16} /> NUEVO CLIENTE
         </button>
       </div>
 
-      <div className="glass" style={{ padding: 32, borderRadius: 24, marginBottom: 32 }}>
-        <div className="search-bar" style={{ maxWidth: "100%" }}>
-          <Search size={22} className="search-icon" color="#6366f1" />
-          <input id="buscar-cliente" className="input" placeholder="BUSCAR POR NOMBRE, CÉDULA O RNC..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
-            style={{ height: 60, fontSize: 16, paddingLeft: 56, borderRadius: 16, border: "2px solid #eff6ff", background: "#f8fafc" }} />
+      <div className="card" style={{ padding: 24, marginBottom: 24 }}>
+        <div style={{ position: "relative" }}>
+          <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+          <input className="input" placeholder="BUSCAR POR NOMBRE, CÉDULA O RNC..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
+            style={{ paddingLeft: 44, padding: "12px 16px 12px 44px" }} />
         </div>
       </div>
 
-      <div className="glass" style={{ borderRadius: 24, overflow: "hidden" }}>
-        <div className="table-container" style={{ border: "none" }}>
-          <table>
+      <div className="card" style={{ overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table className="datagrid">
             <thead>
               <tr>
                 <th style={{ padding: "16px 32px" }}>NOMBRE COMPLETO</th>
@@ -91,14 +91,12 @@ export default function ClientesPage() {
                   <td style={{ padding: "24px 32px", color: "#475569", fontWeight: 600 }}>{c.email || "—"}</td>
                   <td style={{ padding: "24px 32px", textAlign: "right" }}>
                     <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-                      <button id={`edit-cliente-${c.id}`} className="btn btn-ghost btn-sm" onClick={() => { setForm(c); setModal("editar"); }} 
-                        style={{ background: "#f1f5f9", borderRadius: 10, padding: 10 }}>
-                        <Edit2 size={16} color="#6366f1" />
+                      <button className="btn btn-ghost" style={{ padding: "6px" }} onClick={() => { setForm(c); setModal("editar"); }}>
+                        <Edit2 size={16} />
                       </button>
                       {isAdmin && (
-                        <button id={`del-cliente-${c.id}`} className="btn btn-ghost btn-sm" onClick={() => eliminar(c.id)} 
-                          style={{ background: "#fef2f2", borderRadius: 10, padding: 10 }}>
-                          <Trash2 size={16} color="#ef4444" />
+                        <button className="btn btn-ghost" style={{ padding: "6px", color: "var(--danger)" }} onClick={() => eliminar(c.id)}>
+                          <Trash2 size={16} />
                         </button>
                       )}
                     </div>
@@ -142,10 +140,9 @@ export default function ClientesPage() {
             </div>
 
             <div style={{ marginTop: 40, display: "flex", gap: 16 }}>
-              <button className="btn btn-ghost" onClick={() => setModal(null)} style={{ flex: 1, height: 56, borderRadius: 16, fontWeight: 800 }}>CANCELAR</button>
-              <button id="btn-guardar-cliente" className="btn btn-primary" onClick={guardar} disabled={guardando || !form.nombre} 
-                style={{ flex: 2, height: 56, borderRadius: 16 }}>
-                {guardando ? "GUARDANDO..." : "✓ GUARDAR CLIENTE"}
+              <button className="btn btn-ghost" onClick={() => setModal(null)} style={{ flex: 1 }}>CANCELAR</button>
+              <button className="btn btn-primary" onClick={guardar} disabled={guardando || !form.nombre} style={{ flex: 2 }}>
+                {guardando ? "GUARDANDO..." : "GUARDAR CLIENTE"}
               </button>
             </div>
           </div>
