@@ -36,6 +36,7 @@ export async function POST() {
 
     return NextResponse.json({
       message: "✅ Credenciales actualizadas correctamente",
+      version: "v1.2",
       credenciales: [
         { usuario: adminUser, password: adminPassword, rol: "admin" },
         { usuario: vendedorUser, password: vendedorPassword, rol: "vendedor" },
