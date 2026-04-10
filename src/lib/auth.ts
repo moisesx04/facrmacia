@@ -17,11 +17,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        const email = (credentials.email as string).trim();
+        const password = (credentials.password as string).trim();
+
         const db = supabaseAdmin();
         const { data: user, error } = await db
           .from("usuarios")
           .select("*")
-          .eq("email", credentials.email)
+          .eq("email", email)
           .eq("activo", true)
           .single();
 
@@ -36,16 +39,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         console.log("Auth: User found, checking password...");
         const valid = await bcrypt.compare(
-          credentials.password as string,
+          password,
           user.password_hash
         );
         
         if (!valid) {
-          console.log("Auth: Invalid password for:", credentials.email);
+          console.log("Auth: Invalid password for:", email);
           return null;
         }
 
-        console.log("Auth: Login successful for:", credentials.email);
+        console.log("Auth: Login successful for:", email);
 
         return {
           id: user.id,
