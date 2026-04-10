@@ -1,3 +1,4 @@
+// Triggering redeploy to sync environment variables v1.3
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { supabaseAdmin } from "@/lib/supabase";
