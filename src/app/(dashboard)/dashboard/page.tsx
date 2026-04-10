@@ -3,20 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import {
-  TrendingUp,
-  ShoppingBag,
-  AlertTriangle,
-  FileText,
-  DollarSign,
-  Package,
-  ShoppingCart,
-  Users,
-  LayoutDashboard,
-  CheckCircle,
-  Zap,
-  ArrowRight
-} from "lucide-react";
+import { TrendingUp, ShoppingBag, AlertTriangle, FileText, Package, ShoppingCart, Users, Zap, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
@@ -25,7 +12,6 @@ interface Stats {
   ventasHoy: number;
   totalHoy: number;
   productosStockBajo: number;
-  facturasPendientes: number;
   totalMes: number;
   totalFacturas: number;
   totalProductos?: number;
@@ -64,7 +50,6 @@ export default function DashboardPage() {
           ventasHoy: resHoy.total_facturas || 0,
           totalHoy: resHoy.total_ventas || 0,
           productosStockBajo: Array.isArray(resAlertas) ? resAlertas.length : 0,
-          facturasPendientes: 0,
           totalMes: resMes.total_ventas || 0,
           totalFacturas: resMes.total_facturas || 0,
           totalProductos: resTotal.count || 0
@@ -81,99 +66,71 @@ export default function DashboardPage() {
   }, [isAdmin]);
 
   return (
-    <div className="fade-in" style={{ maxWidth: 1600, margin: "0 auto", paddingBottom: 100 }}>
-      {/* HEADER DASHBOARD V7 */}
-      <div className="page-header" style={{ marginBottom: 48 }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
+      {/* Encabezado */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 32 }}>
         <div>
-          <h1 className="page-title">Panel de Control</h1>
-          <p className="page-subtitle">RADIANT ELITE V7.0 • MODO CLARO</p>
+          <h1 className="page-title">General</h1>
+          <p className="page-subtitle">Panel de control de la farmacia</p>
         </div>
-        <div style={{ display: "flex", gap: 16 }}>
-          <button className="btn btn-ghost hover-lift" onClick={() => router.push("/reportes")} style={{ height: 56, padding: "0 24px" }}>
-            <FileText size={20} /> REPORTES
+        <div style={{ display: "flex", gap: 12 }}>
+          <button className="btn btn-outline" onClick={() => router.push("/reportes")}>
+            <FileText size={16} /> Ver Reportes
           </button>
-          <button className="btn btn-primary hover-lift" onClick={() => router.push("/ventas")} style={{ height: 56, padding: "0 32px" }}>
-             <ShoppingCart size={20} /> VENTA NUEVA
+          <button className="btn btn-primary" onClick={() => router.push("/ventas")}>
+             <Plus size={16} /> Nueva Venta
           </button>
         </div>
       </div>
 
-      {/* METRICAS V7.0 HERO */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24, marginBottom: 56 }}>
-        <StatCard loading={loading} icon={<TrendingUp size={28} />} value={`RD$${stats?.totalHoy.toLocaleString() || "0"}`} label="Ventas de Hoy" color="#6366f1" />
-        <StatCard loading={loading} icon={<ShoppingBag size={28} />} value={stats?.ventasHoy || "0"} label="Facturas Emitidas" color="#10b981" />
-        <StatCard loading={loading} icon={<Package size={28} />} value={stats?.totalProductos || "0"} label="Catálogo Total" color="#a855f7" />
-        <StatCard loading={loading} icon={<AlertTriangle size={28} />} value={stats?.productosStockBajo || "0"} label="Alertas de Stock" color="#ef4444" alert={Boolean(stats?.productosStockBajo && stats.productosStockBajo > 0)} />
+      {/* Métricas Principales */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
+        <MetricCard title="Ventas Hoy" value={`RD$${stats?.totalHoy.toLocaleString() || "0"}`} loading={loading} />
+        <MetricCard title="Facturas Hoy" value={stats?.ventasHoy || "0"} loading={loading} />
+        <MetricCard title="Productos en Catálogo" value={stats?.totalProductos || "0"} loading={loading} />
+        <MetricCard title="Alertas de Stock" value={stats?.productosStockBajo || "0"} loading={loading} isWarning={Boolean(stats?.productosStockBajo && stats.productosStockBajo > 0)} />
       </div>
 
-      {/* SECCION CENTRAL RADIANT */}
-      <div style={{ display: "grid", gridTemplateColumns: isAdmin ? "minmax(0, 1fr) minmax(0, 1.8fr)" : "1fr", gap: 32 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isAdmin ? "350px 1fr" : "1fr", gap: 24 }}>
+        {/* Alertas */}
         {isAdmin && (
-          <div className="glass" style={{ padding: 32, borderRadius: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-              <div style={{ width: 44, height: 44, background: "rgba(239, 68, 68, 0.08)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}><AlertTriangle size={20} color="#ef4444" /></div>
-              <div>
-                <h3 style={{ fontSize: 18, fontWeight: 950, color: "#0f172a" }}>Reabastecimiento</h3>
-                <p style={{ fontSize: 11, fontWeight: 800, color: "#94a3b8" }}>STOCK CRÍTICO DETECTADO</p>
-              </div>
-              <span style={{ marginLeft: "auto", background: "#ef4444", color: "white", padding: "4px 12px", borderRadius: 10, fontSize: 12, fontWeight: 950 }}>{alertas.length}</span>
+          <div className="card" style={{ padding: 24, alignSelf: "start" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 600 }}>Stock Crítico</h3>
+              {alertas.length > 0 && <span className="badge badge-danger">{alertas.length}</span>}
             </div>
             
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {alertas.length === 0 ? (
-                <div style={{ padding: 48, textAlign: "center", color: "#94a3b8", fontWeight: 800, background: "#f8fafc", borderRadius: 24 }}>SISTEMA AL DÍA</div>
+                <div style={{ padding: 24, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>Todo al día.</div>
               ) : alertas.map((p) => (
-                <div key={p.id} className="hover-lift" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", background: "white", borderRadius: 20, border: "1px solid #f1f5f9", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 900, color: "#0f172a" }}>{p.nombre.toUpperCase()}</div>
-                    <div style={{ fontSize: 11, color: "#6366f1", fontWeight: 800 }}>REF: {p.codigo}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500 }}>{p.nombre}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{p.codigo}</div>
                   </div>
-                  <div style={{ textAlign: "right", background: "#fee2e2", color: "#991b1b", padding: "6px 12px", borderRadius: 10, fontSize: 13, fontWeight: 950 }}>
-                    {p.stock_actual} Uds.
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--danger)" }}>
+                    {p.stock_actual} uds
                   </div>
                 </div>
               ))}
             </div>
+            {alertas.length > 0 && (
+               <button className="btn btn-outline" style={{ width: "100%", marginTop: 16 }} onClick={() => router.push("/inventario")}>
+                 Gestionar Inventario
+               </button>
+            )}
           </div>
         )}
 
-        <div className="glass" style={{ padding: 32, borderRadius: 32 }}>
-          <div style={{ marginBottom: 32 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 950, color: "#0f172a" }}>Servicios del Sistema</h3>
-            <p style={{ fontSize: 11, fontWeight: 800, color: "#94a3b8" }}>ACCESOS RÁPIDOS V7.0 ELITE</p>
-          </div>
-          
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
-            {[
-              { href: "/ventas", icon: <ShoppingCart size={24} />, label: "Terminal POS", color: "#6366f1", desc: "Venta Directa" },
-              { href: "/inventario", icon: <Package size={24} />, label: "Catálogo", color: "#a855f7", desc: "Gestionar Stock" },
-              { href: "/clientes", icon: <Users size={24} />, label: "Pacientes", color: "#10b981", desc: "Base de Clientes" },
-              { href: "/facturas", icon: <FileText size={24} />, label: "Historial", color: "#f59e0b", desc: "Facturas Emitidas" },
-            ].map((item, idx) => (
-              <Link key={idx} href={item.href} className="hover-lift" style={{
-                display: "flex", alignItems: "center", gap: 16, padding: "24px", textDecoration: "none",
-                background: "#ffffff", border: "1px solid #f1f5f9", borderRadius: 24, boxShadow: "0 6px 12px -2px rgba(0,0,0,0.03)"
-              }}>
-                <div style={{ width: 48, height: 48, background: `${item.color}08`, color: item.color, borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {item.icon}
-                </div>
-                <div>
-                   <div style={{ fontSize: 14, fontWeight: 950, color: "#0f172a" }}>{item.label}</div>
-                   <div style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8" }}>{item.desc}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-          
-          <div style={{ marginTop: 40, padding: "32px", borderRadius: 28, background: "linear-gradient(135deg, #0f172a, #1e293b)", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.2em" }}>SISTEMA PROFESIONAL</div>
-                <div style={{ fontSize: 20, fontWeight: 950 }}>FarmaSystem Radiant V7.0</div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(16, 185, 129, 0.15)", padding: "10px 20px", borderRadius: 14, border: "1px solid rgba(16, 185, 129, 0.3)" }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", boxShadow: "0 0 10px #10b981" }} />
-                <span style={{ fontSize: 11, fontWeight: 950, color: "#10b981" }}>ONLINE</span>
-              </div>
+        {/* Accesos */}
+        <div className="card" style={{ padding: 24 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 20 }}>Accesos Rápidos</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+            <ShortcutCard href="/ventas" icon={<ShoppingCart size={20} />} title="Terminal POS" desc="Venta directa en caja" />
+            <ShortcutCard href="/inventario" icon={<Package size={20} />} title="Catálogo" desc="Administrar existencias" />
+            <ShortcutCard href="/clientes" icon={<Users size={20} />} title="Clientes" desc="Directorio de clientes" />
+            <ShortcutCard href="/facturas" icon={<FileText size={20} />} title="Facturación" desc="Historial y comprobantes" />
           </div>
         </div>
       </div>
@@ -181,29 +138,36 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ loading, icon, value, label, color, alert }: any) {
+function MetricCard({ title, value, loading, isWarning }: any) {
   return (
-    <div className="glass hover-lift" style={{ 
-      padding: 32, borderRadius: 32, background: "white",
-      borderLeft: alert ? `8px solid ${color}` : "1px solid #f1f5f9"
-    }}>
-      <div style={{ position: "relative" }}>
-        <div style={{ 
-          width: 52, height: 52, borderRadius: 14, background: `${color}08`, color: color,
-          display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20,
-          border: "1px solid rgba(0,0,0,0.02)"
-        }}>
-          {icon}
+    <div className="card" style={{ padding: 24 }}>
+      <div style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, marginBottom: 8 }}>{title}</div>
+      {loading ? (
+        <div style={{ height: 28, width: 80, background: "var(--border)", borderRadius: 4, animation: "pulse 1.5s infinite" }} />
+      ) : (
+        <div style={{ fontSize: 24, fontWeight: 600, color: isWarning ? "var(--danger)" : "var(--text-main)" }}>
+          {value}
         </div>
-        {loading ? (
-          <div className="skeleton" style={{ height: 40, width: "60%", borderRadius: 8 }} />
-        ) : (
-          <div style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 950, color: "#0f172a", letterSpacing: "-0.04em", lineHeight: 1, marginBottom: 4 }}>
-            {value}
-          </div>
-        )}
-        <div style={{ fontSize: 12, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</div>
-      </div>
+      )}
     </div>
   );
 }
+
+function ShortcutCard({ href, icon, title, desc }: any) {
+  return (
+    <Link href={href} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", color: "inherit", transition: "all 0.15s" }}
+      onMouseOver={(e) => (e.currentTarget.style.borderColor = "var(--text-main)")}
+      onMouseOut={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
+    >
+      <div style={{ width: 32, height: 32, borderRadius: 6, background: "#f8fafc", color: "var(--text-main)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {icon}
+      </div>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-main)" }}>{title}</div>
+        <div style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>{desc}</div>
+      </div>
+    </Link>
+  );
+}
+
+function Plus({size}: {size: number}) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> }
