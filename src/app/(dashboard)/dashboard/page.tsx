@@ -66,7 +66,7 @@ export default function DashboardPage() {
   }, [isAdmin]);
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
+    <div style={{ maxWidth: 1600, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
       {/* Encabezado */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 32 }}>
         <div>

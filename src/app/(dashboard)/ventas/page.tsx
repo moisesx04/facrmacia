@@ -32,8 +32,8 @@ export default function VentasPage() {
 
   const buscarProductos = useCallback(async (q: string) => {
     const res = await fetch(`/api/productos?q=${encodeURIComponent(q)}&limit=15`);
-    const data = await res.json();
-    setProductos(Array.isArray(data) ? data : []);
+    const result = await res.json();
+    setProductos(result.data ? result.data : (Array.isArray(result) ? result : []));
   }, []);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function VentasPage() {
   }
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
+    <div style={{ maxWidth: 1600, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 24 }}>
         <div>
           <h1 className="page-title">Punto de Venta</h1>
