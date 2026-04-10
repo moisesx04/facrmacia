@@ -25,6 +25,7 @@ export default function InventarioPage() {
   const [guardando, setGuardando] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
   const [importResult, setImportResult] = useState<{ insertados: number; errores: string[] } | null>(null);
+  const [confirmPassword, setConfirmPassword] = useState<{ open: boolean; id: string; pass: string; error: string; loading: boolean }>({ open: false, id: "", pass: "", error: "", loading: false });
   const fileRef = useRef<HTMLInputElement>(null);
 
   async function cargar() {
@@ -67,13 +68,29 @@ export default function InventarioPage() {
     }
   }
 
-  async function eliminar(id: string) {
-    if (!confirm("¿Eliminar este producto?")) return;
-    await fetch(`/api/productos?id=${id}`, { method: "DELETE" });
-    await cargar();
+  async function handleEliminar() {
+    setConfirmPassword(p => ({ ...p, loading: true, error: "" }));
+    try {
+      const res = await fetch("/api/auth/verify-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: confirmPassword.pass })
+      });
+      
+      if (res.ok) {
+        await fetch(`/api/productos?id=${confirmPassword.id}`, { method: "DELETE" });
+        setConfirmPassword({ open: false, id: "", pass: "", error: "", loading: false });
+        await cargar();
+      } else {
+        const data = await res.json();
+        setConfirmPassword(p => ({ ...p, error: data.error || "Contraseña inválida", loading: false }));
+      }
+    } catch (err) {
+      setConfirmPassword(p => ({ ...p, error: "Error de conexión", loading: false }));
+    }
   }
 
-  async function importarCSV(e: React.ChangeEvent<HTMLInputElement>) {
+  async function importarFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportLoading(true);
@@ -189,8 +206,8 @@ export default function InventarioPage() {
                           <Edit2 size={16} color="#6366f1" />
                         </button>
                         {isAdmin && (
-                          <button className="btn btn-ghost btn-sm" onClick={() => eliminar(p.id)} style={{ background: "#fef2f2", borderRadius: 10, padding: 10 }}>
-                            <Trash2 size={16} color="#ef4444" />
+                          <button className="btn btn-ghost btn-sm" onClick={() => setConfirmPassword({ open: true, id: p.id, pass: "", error: "", loading: false })} style={{ background: "#fef2f2", borderRadius: 10, padding: 8 }}>
+                            <Trash2 size={15} color="#ef4444" />
                           </button>
                         )}
                       </div>
@@ -253,29 +270,63 @@ export default function InventarioPage() {
       {/* Modal Importar refined */}
       {modal === "importar" && (
         <div className="modal-overlay">
-          <div className="modal" style={{ borderRadius: 28, padding: 40, background: "white", maxWidth: 500 }}>
-            <div style={{ background: "#eff6ff", padding: 20, borderRadius: 16, border: "1px dashed #6366f1", marginBottom: 24 }}>
-               <h4 style={{ fontSize: 12, fontWeight: 900, color: "#1e40af", marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
-                  <TrendingUp size={16} /> IMPORTACIÓN INTELIGENTE ACTIVA
+          <div className="modal" style={{ borderRadius: 28, padding: 32, background: "white", maxWidth: 500 }}>
+            <div className="modal-header" style={{ marginBottom: 20 }}>
+               <h4 style={{ fontSize: 13, fontWeight: 900 }}>IMPORTAR PRODUCTOS</h4>
+               <button className="btn btn-ghost btn-icon" onClick={() => setModal(null)}><X size={20} /></button>
+            </div>
+
+            <div style={{ background: "#eff6ff", padding: 16, borderRadius: 16, border: "1px dashed #6366f1", marginBottom: 24 }}>
+               <h4 style={{ fontSize: 11, fontWeight: 900, color: "#1e40af", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                  <TrendingUp size={14} /> CARGA INTELIGENTE CSV / TXT
                </h4>
-               <p style={{ fontSize: 11, color: "#1e40af", fontWeight: 600, lineHeight: 1.5 }}>{INFO_MERGE}</p>
+               <p style={{ fontSize: 11, color: "#1e40af", fontWeight: 600, lineHeight: 1.4 }}>
+                 Aceptamos archivos CSV con columnas o una lista TXT solo con nombres de productos (uno por línea).
+               </p>
             </div>
             
-            <button className="btn btn-ghost" onClick={descargarPlantilla} style={{ width: "100%", height: 52, borderRadius: 14, marginBottom: 16, border: "2px solid #eff6ff" }}>
-              <Download size={18} /> DESCARGAR PLANTILLA EXCEL (CSV)
+            <button className="btn btn-ghost" onClick={descargarPlantilla} style={{ width: "100%", height: 44, borderRadius: 12, marginBottom: 16, border: "2px solid #eff6ff" }}>
+              <Download size={16} /> BAJAR PLANTILLA CSV
             </button>
             
-            <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={importarCSV} />
-            <button className="btn btn-primary" onClick={() => fileRef.current?.click()} disabled={importLoading} style={{ width: "100%", height: 56, borderRadius: 16 }}>
-              <Upload size={18} /> {importLoading ? "IMPORTANDO..." : "SUBIR ARCHIVO CSV"}
+            <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: "none" }} onChange={importarFile} />
+            <button className="btn btn-primary" onClick={() => fileRef.current?.click()} disabled={importLoading} style={{ width: "100%", height: 48, borderRadius: 14 }}>
+              <Upload size={18} /> {importLoading ? "IMPORTANDO..." : "SUBIR CSV O TXT"}
             </button>
             
             {importResult && (
-              <div style={{ marginTop: 24, padding: 20, background: "#f0fdf4", border: "2px solid #dcfce7", borderRadius: 18 }}>
-                <div style={{ color: "#166534", fontWeight: 800 }}>✅ {importResult.insertados} PRODUCTOS CARGADOS</div>
-                {importResult.errores.length > 0 && <div style={{ color: "#991b1b", marginTop: 10, fontSize: 12, fontFamily: "monospace" }}>{importResult.errores.join(", ")}</div>}
+              <div style={{ marginTop: 24, padding: 16, background: "#f0fdf4", border: "2px solid #dcfce7", borderRadius: 14 }}>
+                <div style={{ color: "#166534", fontSize: 13, fontWeight: 900 }}>✅ {importResult.insertados} PRODUCTOS PROCESADOS</div>
+                {importResult.errores?.length > 0 && <div style={{ color: "#991b1b", marginTop: 8, fontSize: 11 }}>{importResult.errores.join(", ")}</div>}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal Seguridad Nueva */}
+      {confirmPassword.open && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ borderRadius: 28, padding: 32, background: "white", maxWidth: 400, textAlign: "center" }}>
+             <div style={{ width: 64, height: 64, background: "#fef2f2", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+                <AlertTriangle size={32} color="#ef4444" />
+             </div>
+             <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", marginBottom: 8 }}>Confirmar Eliminación</h3>
+             <p style={{ fontSize: 12, color: "#64748b", marginBottom: 24, fontWeight: 600 }}>Esta acción no se puede deshacer. Por favor, ingresa tu contraseña de administrador.</p>
+             
+             <input className="input" type="password" placeholder="Contraseña Admin" 
+               value={confirmPassword.pass} onChange={(e) => setConfirmPassword(p => ({ ...p, pass: e.target.value, error: "" }))}
+               style={{ height: 48, borderRadius: 14, background: "#f8fafc", border: "2px solid #eff6ff", textAlign: "center", marginBottom: 12 }} />
+             
+             {confirmPassword.error && <div style={{ color: "#ef4444", fontSize: 11, fontWeight: 800, marginBottom: 12 }}>{confirmPassword.error.toUpperCase()}</div>}
+
+             <div style={{ display: "flex", gap: 12 }}>
+                <button className="btn btn-ghost" onClick={() => setConfirmPassword({ ...confirmPassword, open: false })} style={{ flex: 1, height: 48, borderRadius: 14 }}>CANCELAR</button>
+                <button className="btn btn-primary" onClick={handleEliminar} disabled={confirmPassword.loading || !confirmPassword.pass} 
+                  style={{ flex: 1, height: 48, borderRadius: 14, background: "#ef4444" }}>
+                  {confirmPassword.loading ? "..." : "ELIMINAR"}
+                </button>
+             </div>
           </div>
         </div>
       )}
