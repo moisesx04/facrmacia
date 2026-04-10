@@ -35,7 +35,7 @@ export default function VentasPage() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [facturaActual, setFacturaActual] = useState<InvoiceData | null>(null);
-  const [modoPrint, setModoPrint] = useState<"a4" | "termica">("a4");
+  const [modoPrint, setModoPrint] = useState<"a4" | "termica">("termica");
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({ contentRef: printRef });
@@ -49,6 +49,15 @@ export default function VentasPage() {
   useEffect(() => {
     buscarProductos(busqueda);
   }, [busqueda, buscarProductos]);
+
+  // Auto-imprimir al generar factura
+  useEffect(() => {
+    if (facturaActual) {
+      setTimeout(() => {
+        handlePrint();
+      }, 500);
+    }
+  }, [facturaActual, handlePrint]);
 
   useEffect(() => {
     Promise.all([
@@ -291,39 +300,25 @@ export default function VentasPage() {
             </div>
 
             <div>
-              <label className="label">Descuento (RD$)</label>
-              <input className="input" type="number" min={0} value={descuento} onChange={(e) => setDescuento(parseFloat(e.target.value) || 0)} />
-            </div>
-          </div>
-
-          {/* Totales */}
-          <div className="glass" style={{ padding: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13, color: "var(--text-secondary)" }}>
-              <span>Subtotal</span><span>RD${subtotal.toFixed(2)}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13, color: "var(--text-secondary)" }}>
-              <span>ITBIS</span><span>RD${itbisTotal.toFixed(2)}</span>
-            </div>
-            {descuento > 0 && <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, fontSize: 13, color: "var(--danger)" }}>
-              <span>Descuento</span><span>-RD${descuento.toFixed(2)}</span>
-            </div>}
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 800, marginTop: 8, color: "var(--success)" }}>
-              <span>TOTAL</span><span>RD${total.toFixed(2)}</span>
-            </div>
-          </div>
 
           {error && (
-            <div style={{ display: "flex", gap: 8, padding: "10px 14px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "var(--radius-sm)", color: "#f87171", fontSize: 13 }}>
-              <AlertCircle size={16} style={{ flexShrink: 0 }} /> {error}
+            <div style={{ display: "flex", gap: 10, padding: "16px", background: "#f8fafc", border: "3px solid #000000", color: "#000000", fontSize: 13, fontWeight: 800 }}>
+              <AlertCircle size={20} style={{ flexShrink: 0 }} />
+              <div>
+                <div style={{ textTransform: "uppercase", marginBottom: 4 }}>ERROR DE SISTEMA</div>
+                <div style={{ fontWeight: 500, lineHeight: 1.4 }}>{error}</div>
+              </div>
             </div>
           )}
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <button id="btn-cobrar" className="btn btn-success" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pagada")} style={{ justifyContent: "center" }}>
-              {cargando ? "Procesando..." : "✓ Cobrar"}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <button id="btn-cobrar" className="btn btn-primary btn-lg" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pagada")} 
+              style={{ justifyContent: "center", background: "#000000", border: "2px solid #000000", borderRadius: 0, fontWeight: 900 }}>
+              {cargando ? "CARGANDO..." : "✓ COBRAR"}
             </button>
-            <button id="btn-credito" className="btn btn-ghost" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pendiente")} style={{ justifyContent: "center" }}>
-              📋 A Crédito
+            <button id="btn-credito" className="btn btn-ghost btn-lg" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pendiente")} 
+              style={{ justifyContent: "center", border: "2px solid #000000", borderRadius: 0, fontWeight: 900, color: "#000000" }}>
+              📋 A CRÉDITO
             </button>
           </div>
         </div>
@@ -332,24 +327,40 @@ export default function VentasPage() {
       {/* Modal de factura generada */}
       {facturaActual && (
         <div className="modal-overlay">
-          <div className="modal modal-lg">
+          <div className="modal" style={{ maxWidth: 450 }}>
             <div className="modal-header">
-              <h2>✅ Venta Completada — {facturaActual.ncf}</h2>
+              <div style={{ padding: "4px 12px", fontSize: 13, fontWeight: 900, letterSpacing: "0.1em", color: "#000000", border: "1px solid #000000", borderRadius: 8 }}>VENTA EXITOSA</div>
               <button className="btn btn-ghost btn-icon" onClick={() => setFacturaActual(null)}><X size={18} /></button>
             </div>
-            <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
-              <button id="btn-print-a4" className="btn btn-primary" onClick={() => { setModoPrint("a4"); setTimeout(handlePrint, 100); }}>
-                <Printer size={16} /> Imprimir A4
+            
+            <div style={{ textAlign: "center", padding: "24px 0" }}>
+              <div style={{ 
+                width: 64, height: 64, background: "#f0fdf4", color: "#166534", 
+                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" 
+              }}>
+                <Check size={32} />
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{facturaActual.ncf}</div>
+              <p style={{ fontSize: 13, color: "#71717a", fontWeight: 800, textTransform: "uppercase" }}>Imprimiendo Ticket Térmico...</p>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+              <button className="btn btn-primary btn-lg" onClick={() => handlePrint()}
+                style={{ borderRadius: 14, fontWeight: 900, height: 60, fontSize: 16 }}>
+                <Printer size={20} /> RE-IMPRIMIR TICKET
               </button>
-              <button id="btn-print-termica" className="btn btn-ghost" onClick={() => { setModoPrint("termica"); setTimeout(handlePrint, 100); }}>
-                <Printer size={16} /> Térmica 80mm
+              <button className="btn btn-ghost" onClick={() => setFacturaActual(null)} 
+                style={{ borderRadius: 14, fontWeight: 800, height: 48, border: "1.5px solid #f1f5f9" }}>
+                LISTO / NUEVA VENTA
               </button>
             </div>
-            <div style={{ border: "1px solid var(--border)", borderRadius: "var(--radius-sm)", overflow: "auto", maxHeight: 500 }}>
-              <PrintInvoice ref={printRef} data={facturaActual} modo={modoPrint} />
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-primary" onClick={() => setFacturaActual(null)}>Nueva Venta</button>
+
+            <div style={{ border: "1px solid #f1f5f9", background: "white", overflow: "hidden", height: 250, borderRadius: 16 }}>
+              <div style={{ height: "100%", overflowY: "auto", padding: 10, opacity: 0.5 }}>
+                <div style={{ transform: "scale(0.8)", transformOrigin: "top center" }}>
+                  <PrintInvoice ref={printRef} data={facturaActual} modo="termica" />
+                </div>
+              </div>
             </div>
           </div>
         </div>

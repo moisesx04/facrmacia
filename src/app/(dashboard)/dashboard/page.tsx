@@ -65,89 +65,115 @@ export default function DashboardPage() {
 
   return (
     <div className="fade-in">
-      <div className="page-header">
+      <div className="page-header" style={{ marginBottom: 40 }}>
         <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle" style={{ textTransform: "capitalize" }}>{today}</p>
+          <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Panel de Control</h1>
+          <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>GESTIÓN INTEGRAL DE OPERACIONES</p>
         </div>
-        <a href="/ventas" className="btn btn-primary">
-          <ShoppingBag size={16} /> Nueva Venta
-        </a>
+        <div style={{ display: "flex", gap: 16 }}>
+          <a href="/ventas" className="btn btn-primary btn-lg" style={{ 
+            borderRadius: 18, padding: "0 32px", fontSize: 16, fontWeight: 800,
+            background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+            boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)"
+          }}>
+            <ShoppingBag size={20} /> NUEVA VENTA
+          </a>
+        </div>
       </div>
 
       {isAdmin ? (
-        <div className="dashboard-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, marginBottom: 32 }}>
-          <StatCard loading={loading} icon={<DollarSign size={22} color="#ffffff" />} iconBg="#000000"
-            value={`RD$${stats?.totalHoy.toLocaleString("es-DO", { minimumFractionDigits: 2 }) || "0.00"}`}
-            label="VENTAS DE HOY" accent="#000000" />
-          <StatCard loading={loading} icon={<FileText size={22} color="#ffffff" />} iconBg="#000000"
-            value={String(stats?.ventasHoy || 0)} label="FACTURAS HOY" accent="#000000" />
-          <StatCard loading={loading} icon={<TrendingUp size={22} color="#ffffff" />} iconBg="#000000"
-            value={`RD$${stats?.totalMes.toLocaleString("es-DO", { minimumFractionDigits: 2 }) || "0.00"}`}
-            label="VENTAS DEL MES" accent="#000000" />
-          <StatCard loading={loading} icon={<AlertTriangle size={22} color="#ffffff" />} iconBg="#000000"
-            value={String(stats?.productosStockBajo || 0)} label="STOCK BAJO" accent="#000000"
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, marginBottom: 40 }}>
+          <StatCard loading={loading} 
+            icon={<DollarSign size={24} color="#ffffff" />} 
+            iconBg="linear-gradient(135deg, #10b981, #059669)"
+            value={`RD$${stats?.totalHoy.toLocaleString("es-DO")}`}
+            label="Ventas de Hoy" 
+            accent="#10b981" />
+          
+          <StatCard loading={loading} 
+            icon={<FileText size={24} color="#ffffff" />} 
+            iconBg="linear-gradient(135deg, #6366f1, #4f46e5)"
+            value={stats?.ventasHoy.toString() || "0"} 
+            label="Facturas Generadas" 
+            accent="#6366f1" />
+
+          <StatCard loading={loading} 
+            icon={<TrendingUp size={24} color="#ffffff" />} 
+            iconBg="linear-gradient(135deg, #3b82f6, #2563eb)"
+            value={`RD$${stats?.totalMes.toLocaleString("es-DO")}`}
+            label="Ingresos del Mes" 
+            accent="#3b82f6" />
+
+          <StatCard loading={loading} 
+            icon={<AlertTriangle size={24} color="#ffffff" />} 
+            iconBg="linear-gradient(135deg, #f59e0b, #d97706)"
+            value={stats?.productosStockBajo.toString() || "0"} 
+            label="Alertas de Inventario" 
+            accent="#f59e0b"
             alert={stats?.productosStockBajo ? stats.productosStockBajo > 0 : false} />
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, marginBottom: 32 }}>
-          <div className="stat-card" style={{ border: "2px solid #000000", background: "#ffffff" }}>
-            <div className="stat-icon" style={{ background: "#000000" }}><ShoppingBag size={22} color="#ffffff" /></div>
-            <div className="stat-value" style={{ color: "#000000" }}>BIENVENIDO</div>
-            <div className="stat-label">SISTEMA LISTO PARA OPERAR</div>
+        <div style={{ padding: 40, background: "white", borderRadius: 24, boxShadow: "var(--shadow-lg)", marginBottom: 40, border: "1px solid rgba(0,0,0,0.05)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            <div style={{ width: 64, height: 64, background: "#f0f9ff", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <CheckCircle size={32} color="#0ea5e9" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>Sistema en Línea</h2>
+              <p style={{ color: "#64748b", fontWeight: 500 }}>Operador autenticado y listo para facturar.</p>
+            </div>
           </div>
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: isAdmin ? "1fr 1fr" : "1fr", gap: 24 }}>
-        {/* Alertas de Stock */}
+      <div style={{ display: "grid", gridTemplateColumns: isAdmin ? "1fr 1.5fr" : "1fr", gap: 32 }}>
+        {/* Alertas con mejor diseño */}
         {isAdmin && alertas.length > 0 && (
-          <div style={{ padding: 24, border: "2px solid #000000", background: "#ffffff" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-              <AlertTriangle size={20} color="#000000" />
-              <h3 style={{ fontSize: 16, fontWeight: 800, textTransform: "uppercase" }}>Alertas de Stock</h3>
-              <span className="badge badge-warning" style={{ marginLeft: "auto", background: "#000000", color: "#ffffff", border: "1px solid #000000" }}>{alertas.length}</span>
+          <div className="glass" style={{ padding: 32, borderRadius: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
+              <div style={{ padding: 10, background: "#fef2f2", borderRadius: 12 }}><AlertTriangle size={20} color="#ef4444" /></div>
+              <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.05em" }}>Stock Crítico</h3>
+              <span style={{ marginLeft: "auto", background: "#ef4444", color: "#fff", padding: "4px 12px", borderRadius: 10, fontSize: 12, fontWeight: 900 }}>{alertas.length}</span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {alertas.map((p) => {
-                const pct = Math.min((p.stock_actual / Math.max(p.stock_minimo * 2, 1)) * 100, 100);
-                return (
-                  <div key={p.id} style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: 10 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, textTransform: "uppercase" }}>{p.nombre}</span>
-                      <span style={{ fontSize: 12, fontWeight: 800 }}>
-                        {p.stock_actual === 0 ? "AGOTADO" : `${p.stock_actual} UNIDADES`}
-                      </span>
-                    </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {alertas.map((p) => (
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px", background: "#f8fafc", borderRadius: 16, border: "1px solid #f1f5f9" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", textTransform: "uppercase" }}>{p.nombre}</div>
+                    <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>CÓDIGO: {p.codigo}</div>
                   </div>
-                );
-              })}
+                  <div style={{ textAlign: "right", background: "#fee2e2", color: "#991b1b", padding: "6px 12px", borderRadius: 10, fontSize: 12, fontWeight: 900 }}>
+                    {p.stock_actual} UNID.
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Accesos rápidos */}
-        <div style={{ padding: 24, border: "2px solid #000000", background: "#ffffff" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, textTransform: "uppercase", marginBottom: 20 }}>Accesos Rápidos</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {/* Accesos rápidos con iconos de colores */}
+        <div className="glass" style={{ padding: 32, borderRadius: 24 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 900, color: "#0f172a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 24 }}>Accesos Directos</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 20 }}>
             {[
-              { href: "/ventas", icon: "🛒", label: "NUEVA VENTA" },
-              { href: "/inventario", icon: "📦", label: "INVENTARIO" },
-              { href: "/clientes", icon: "👥", label: "CLIENTES" },
-              { href: "/facturas", icon: "🧾", label: "FACTURAS" },
-            ].map((item) => (
-              <a key={item.href} href={item.href} style={{
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                padding: "20px 16px", borderRadius: 0, textDecoration: "none",
-                background: "#ffffff", border: "2px solid #e2e8f0", gap: 10,
-                transition: "all 0.2s ease",
+              { href: "/ventas", icon: <ShoppingBag size={32} />, label: "VENDER", bg: "#f0fdf4", color: "#10b981" },
+              { href: "/inventario", icon: <Package size={32} />, label: "PRODUCTOS", bg: "#fffbeb", color: "#f59e0b" },
+              { href: "/clientes", icon: <Users size={32} />, label: "CLIENTES", bg: "#fdf2f7", color: "#ec4899" },
+              { href: "/facturas", icon: <FileText size={32} />, label: "HISTORIAL", bg: "#eff6ff", color: "#3b82f6" },
+            ].map((item, idx) => (
+              <Link key={idx} href={item.href} style={{
+                display: "flex", flexDirection: "column", gap: 16, padding: "32px 20px", textDecoration: "none",
+                background: "#ffffff", border: "1px solid #f1f5f9", borderRadius: 20, transition: "var(--transition)",
+                alignItems: "center"
               }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#000000"; (e.currentTarget as HTMLElement).style.background = "#f8fafc"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#e2e8f0"; (e.currentTarget as HTMLElement).style.background = "#ffffff"; }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-8px)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; e.currentTarget.style.borderColor = item.color; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
               >
-                <span style={{ fontSize: 28 }}>{item.icon}</span>
-                <span style={{ fontSize: 12, fontWeight: 800, color: "#000000" }}>{item.label}</span>
-              </a>
+                <div style={{ width: 64, height: 64, background: item.bg, color: item.color, borderRadius: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {item.icon}
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 900, color: "#0f172a", letterSpacing: "0.05em" }}>{item.label}</span>
+              </Link>
             ))}
           </div>
         </div>

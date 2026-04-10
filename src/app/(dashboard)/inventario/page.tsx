@@ -96,27 +96,6 @@ export default function InventarioPage() {
       )}
 
       <div className="glass" style={{ padding: 20, marginBottom: 20 }}>
-        <div className="search-bar" style={{ maxWidth: "100%" }}>
-          <Search size={16} className="search-icon" />
-          <input id="buscar-inventario" className="input" placeholder="Buscar por nombre o código..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
-        </div>
-      </div>
-
-      <div className="glass">
-        <div className="table-container">
-          <table>
-            <thead><tr>
-              <th>Código</th><th>Nombre</th><th>Precio</th><th>Costo</th>
-              <th>ITBIS</th><th>Stock</th><th>Mínimo</th>{isAdmin && <th>Acciones</th>}
-            </tr></thead>
-            <tbody>
-              {loading ? Array.from({ length: 6 }).map((_, i) => (
-                <tr key={i}>{Array.from({ length: isAdmin ? 8 : 7 }).map((_, j) => (
-                  <td key={j}><div className="skeleton" style={{ height: 16, borderRadius: 4 }} /></td>
-                ))}</tr>
-              )) : productos.map((p) => {
-                const bajo = p.stock_actual <= p.stock_minimo;
-                return (
                   <tr key={p.id}>
                     <td><span className="badge badge-info">{p.codigo}</span></td>
                     <td style={{ fontWeight: 500 }}>{p.nombre}</td>
