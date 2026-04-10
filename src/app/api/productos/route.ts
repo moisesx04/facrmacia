@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
   let dbQuery = db
     .from("productos")
-    .select("*, categorias(nombre)")
+    .select("*, categorias(nombre)", { count: "exact" })
     .eq("activo", true)
     .order("nombre")
     .limit(limit);
@@ -47,11 +47,11 @@ export async function GET(request: NextRequest) {
     dbQuery = dbQuery.eq("categoria_id", categoriaId);
   }
 
-  const { data, error } = await dbQuery;
+  const { data, error, count } = await dbQuery;
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json(data);
+  return NextResponse.json({ data, count });
 }
 
 export async function POST(request: NextRequest) {

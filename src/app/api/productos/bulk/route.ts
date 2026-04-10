@@ -65,12 +65,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ insertados: 0, mensaje: "Formato no reconocido" });
     }
 
-    // 3. Smart Merge con Existentes
+    // 3. Smart Merge con Existentes (Protección de Integridad)
     const { data: existentes } = await db.from("productos").select("id, codigo, nombre, precio, stock_actual");
-    const existingByCode = new Map(existentes?.map(e => [e.codigo.toLowerCase().trim(), e]));
-    const existingByName = new Map(existentes?.map(e => [e.nombre.toLowerCase().trim(), e]));
+    const existingByCode = new Map(existentes?.map(e => [String(e.codigo).toLowerCase().trim(), e]));
+    const existingByName = new Map(existentes?.map(e => [String(e.nombre).toLowerCase().trim(), e]));
 
-    const finalBatch = productos.map(p => {
+    // De-duplicar el propio batch entrante para evitar conflictos internos
+    const seenNames = new Set();
+    const uniqueInput = productos.filter(p => {
+      const slug = String(p.nombre).toLowerCase().trim();
+      if (seenNames.has(slug)) return false;
+      seenNames.add(slug);
+      return true;
+    });
+
+    const finalBatch = uniqueInput.map(p => {
       const nombre = String(p.nombre).trim();
       const codigo = String(p.codigo).trim();
       
@@ -79,28 +88,39 @@ export async function POST(request: NextRequest) {
       if (!dbProd && nombre) dbProd = existingByName.get(nombre.toLowerCase());
 
       if (!dbProd) {
-        // Nuevo producto
+        // Nuevo producto: Generar metadatos robustos
         return {
           ...p,
+          nombre: nombre,
           codigo: codigo || `MED-${Math.random().toString(36).substring(2, 7).toUpperCase()}-${Date.now().toString().slice(-4)}`,
-          itbis: 0.18, aplica_itbis: true, activo: true
+          itbis: 0.18, 
+          aplica_itbis: true, 
+          activo: true
         };
       }
 
-      // Existe -> Smart Merge (No sobrescribir con ceros/vacíos)
+      // Existe -> Smart Merge (No sobrescribir con ceros/vacíos accidentales)
       return {
         ...dbProd,
+        nombre: nombre || dbProd.nombre, // Preferir nombre limpio del batch
         precio: (Number(p.precio) > 0) ? p.precio : dbProd.precio,
         stock_actual: (Number(p.stock_actual) > 0) ? p.stock_actual : dbProd.stock_actual,
         updated_at: new Date().toISOString()
       };
     });
 
-    // 4. Batch Upsert
+    // 4. Batch Upsert (Transaccional)
     const { data: resultData, error } = await db.from("productos").upsert(finalBatch, { onConflict: "codigo" }).select("id");
 
-    if (error) throw error;
-    return NextResponse.json({ insertados: resultData?.length || 0 });
+    if (error) {
+      console.error("Supabase Upsert Error:", error);
+      throw error;
+    }
+    
+    return NextResponse.json({ 
+      insertados: resultData?.length || 0,
+       mensaje: "Importación completada con integridad de datos" 
+    });
 
   } catch (err: any) {
     console.error("Bulk Error:", err);
