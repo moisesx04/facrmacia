@@ -3,12 +3,15 @@ import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
 export async function GET() {
+  const mask = (val: string | undefined) => 
+    val ? `${val.substring(0, 10)}...${val.substring(val.length - 4)}` : "MISSING";
+
   const results: any = {
     env: {
-      url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      anon: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      secret: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      auth: !!process.env.NEXTAUTH_SECRET,
+      url: mask(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      anon: mask(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+      secret: mask(process.env.SUPABASE_SERVICE_ROLE_KEY),
+      auth: mask(process.env.NEXTAUTH_SECRET),
     },
     checks: [],
   };
@@ -38,7 +41,19 @@ export async function GET() {
         detail: isMatch ? "Hashes match admin1234@" : "Hashes DO NOT match admin1234@"
       });
 
-      // 3. Check bcrypt rounds
+      // 3. Check reports query
+      const { error: queryError } = await db
+        .from("facturas")
+        .select(`id, clientes(nombre), usuarios!usuario_id(nombre), factura_items(productos(nombre))`)
+        .limit(1);
+
+      if (queryError) {
+        results.checks.push({ name: "Reports query test", status: "❌ FAIL", error: queryError });
+      } else {
+        results.checks.push({ name: "Reports query test", status: "✅ OK" });
+      }
+
+      // 4. Check bcrypt rounds
       const start = Date.now();
       await bcrypt.hash("test", 12);
       const duration = Date.now() - start;
