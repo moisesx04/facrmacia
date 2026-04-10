@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import bcrypt from "bcryptjs";
 
+export async function GET() { return await POST(); }
+
 export async function POST() {
   try {
     const db = supabaseAdmin();
