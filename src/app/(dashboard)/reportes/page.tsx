@@ -122,9 +122,9 @@ export default function ReportesPage() {
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 450px), 1fr))", gap: 32 }}>
             {/* Por método de pago */}
-            <div className="glass" style={{ padding: 40, borderRadius: 28 }}>
+            <div className="glass" style={{ padding: "clamp(24px, 5vw, 40px)", borderRadius: 28 }}>
               <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f172a", marginBottom: 32, letterSpacing: "-0.02em" }}>Desglose por Método de Pago</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
                 {Object.entries(resumen.por_metodo_pago || {}).map(([metodo, monto]) => {
@@ -152,7 +152,7 @@ export default function ReportesPage() {
             </div>
 
             {/* Resumen Informativo */}
-            <div className="glass" style={{ padding: 40, borderRadius: 28, background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", color: "white" }}>
+            <div className="glass" style={{ padding: "clamp(24px, 5vw, 40px)", borderRadius: 28, background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", color: "white" }}>
               <h3 style={{ fontSize: 18, fontWeight: 900, marginBottom: 32 }}>Información del Período</h3>
               <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.6, fontSize: 14 }}>
                 Este reporte comprende el intervalo del **{format(new Date(desde), "dd 'de' MMMM", { locale: es })}** al **{format(new Date(hasta), "dd 'de' MMMM", { locale: es })}**.
@@ -161,7 +161,7 @@ export default function ReportesPage() {
               </p>
               <div style={{ marginTop: 40, padding: 24, background: "rgba(255,255,255,0.05)", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)" }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.4)", marginBottom: 16, letterSpacing: "0.1em" }}>RENDIMIENTO PROMEDIO</div>
-                <div style={{ fontSize: 32, fontWeight: 900 }}>RD${(resumen.total_ventas / 30).toLocaleString()}</div>
+                <div style={{ fontSize: "clamp(24px, 4vw, 32px)", fontWeight: 900 }}>RD${(resumen.total_ventas / 30).toLocaleString()}</div>
                 <div style={{ fontSize: 12, color: "#10b981", fontWeight: 700, marginTop: 4 }}>↑ 12% COMPARADO CON MES ANTERIOR</div>
               </div>
             </div>
