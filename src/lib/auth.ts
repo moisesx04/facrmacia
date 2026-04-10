@@ -12,23 +12,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        if (!credentials?.email || !credentials?.password) {
+          console.log("Auth: Missing credentials");
+          return null;
+        }
 
         const db = supabaseAdmin();
-        const { data: user } = await db
+        const { data: user, error } = await db
           .from("usuarios")
           .select("*")
           .eq("email", credentials.email)
           .eq("activo", true)
           .single();
 
-        if (!user) return null;
+        if (error) {
+          console.error("Auth: Error looking up user:", error);
+        }
 
+        if (!user) {
+          console.log("Auth: User not found or inactive:", credentials.email);
+          return null;
+        }
+
+        console.log("Auth: User found, checking password...");
         const valid = await bcrypt.compare(
           credentials.password as string,
           user.password_hash
         );
-        if (!valid) return null;
+        
+        if (!valid) {
+          console.log("Auth: Invalid password for:", credentials.email);
+          return null;
+        }
+
+        console.log("Auth: Login successful for:", credentials.email);
 
         return {
           id: user.id,
