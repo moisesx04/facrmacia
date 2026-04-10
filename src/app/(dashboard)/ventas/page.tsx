@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useReactToPrint } from "react-to-print";
-import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, AlertCircle, X } from "lucide-react";
+import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, AlertCircle, X, Check } from "lucide-react";
 import { PrintInvoice, type InvoiceData } from "@/components/PrintInvoice";
 import { NCF_LABELS, type NCFTipo } from "@/lib/ncf";
+import Link from "next/link";
 
 interface Producto {
   id: string;
@@ -35,7 +36,6 @@ export default function VentasPage() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [facturaActual, setFacturaActual] = useState<InvoiceData | null>(null);
-  const [modoPrint, setModoPrint] = useState<"a4" | "termica">("termica");
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({ contentRef: printRef });
@@ -50,7 +50,6 @@ export default function VentasPage() {
     buscarProductos(busqueda);
   }, [busqueda, buscarProductos]);
 
-  // Auto-imprimir al generar factura
   useEffect(() => {
     if (facturaActual) {
       setTimeout(() => {
@@ -146,7 +145,7 @@ export default function VentasPage() {
       });
       setCart([]);
       setDescuento(0);
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : "Error desconocido");
     } finally {
       setCargando(false);
@@ -155,61 +154,62 @@ export default function VentasPage() {
 
   return (
     <div className="fade-in">
-      <div className="page-header">
+      <div className="page-header" style={{ marginBottom: 40 }}>
         <div>
-          <h1 className="page-title">Punto de Venta</h1>
-          <p className="page-subtitle">Registra ventas con NCF fiscal automático</p>
+          <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Punto de Venta</h1>
+          <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>TERMINAL DE FACTURACIÓN RÁPIDA</p>
         </div>
       </div>
 
-      <div className="pos-layout">
+      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 32, height: "calc(100vh - 200px)" }}>
         {/* Panel izquierdo: búsqueda de productos */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, minHeight: 0, flex: 1 }}>
-          <div style={{ padding: 16, background: "white", border: "2px solid #000000" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24, minHeight: 0 }}>
+          <div className="glass" style={{ padding: 24, borderRadius: 20 }}>
             <div className="search-bar" style={{ maxWidth: "100%" }}>
-              <Search size={16} className="search-icon" />
+              <Search size={22} className="search-icon" color="#6366f1" />
               <input
                 id="busqueda-producto"
                 className="input"
-                placeholder="BUSCAR PRODUCTO..."
+                placeholder="BUSCAR MEDICAMENTO O CÓDIGO..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 autoFocus
-                style={{ borderRadius: 0, border: "2px solid #000000", height: 48, fontWeight: 700 }}
+                style={{ height: 60, fontSize: 16, paddingLeft: 56, borderRadius: 16, border: "2px solid #eff6ff", background: "#f8fafc" }}
               />
             </div>
           </div>
 
-          <div style={{ flex: 1, overflow: "hidden", border: "2px solid #000000", background: "white" }}>
-            <div className="table-container" style={{ maxHeight: "calc(100vh - 350px)", overflowY: "auto" }}>
-              <table>
+          <div className="glass" style={{ flex: 1, overflow: "hidden", borderRadius: 24, display: "flex", flexDirection: "column" }}>
+            <div className="table-container" style={{ flex: 1, overflowY: "auto", border: "none" }}>
+              <table style={{ width: "100%" }}>
                 <thead>
                   <tr>
-                    <th>Producto</th>
-                    <th>Código</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th></th>
+                    <th style={{ padding: "16px 24px" }}>PRODUCTO</th>
+                    <th style={{ padding: "16px 24px" }}>PRECIO</th>
+                    <th style={{ padding: "16px 24px" }}>STOCK</th>
+                    <th style={{ padding: "16px 24px", textAlign: "right" }}></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {productos.length === 0 ? (
-                    <tr><td colSpan={5} style={{ textAlign: "center", color: "var(--text-muted)", padding: 32 }}>
-                      {busqueda ? "No se encontraron productos" : "Escribe para buscar..."}
-                    </td></tr>
-                  ) : productos.map((p) => (
+                  {productos.map((p) => (
                     <tr key={p.id}>
-                      <td style={{ fontWeight: 500 }}>{p.nombre}</td>
-                      <td><span className="badge badge-info">{p.codigo}</span></td>
-                      <td style={{ color: "var(--success)", fontWeight: 600 }}>RD${p.precio.toFixed(2)}</td>
-                      <td>
-                        <span className={p.stock_actual === 0 ? "badge badge-danger" : p.stock_actual <= 5 ? "badge badge-warning" : "badge badge-success"}>
-                          {p.stock_actual}
+                      <td style={{ padding: "16px 24px" }}>
+                        <div style={{ fontWeight: 800, color: "#0f172a" }}>{p.nombre.toUpperCase()}</div>
+                        <div style={{ fontSize: 11, color: "#64748b", fontWeight: 600 }}>CÓD.: {p.codigo}</div>
+                      </td>
+                      <td style={{ padding: "16px 24px", color: "#6366f1", fontWeight: 800 }}>RD${p.precio.toLocaleString()}</td>
+                      <td style={{ padding: "16px 24px" }}>
+                        <span style={{ 
+                          padding: "4px 10px", borderRadius: 8, fontSize: 12, fontWeight: 900,
+                          background: p.stock_actual <= 5 ? "#fffbeb" : "#f0fdf4",
+                          color: p.stock_actual <= 5 ? "#d97706" : "#10b981"
+                        }}>
+                          {p.stock_actual} UNID.
                         </span>
                       </td>
-                      <td>
-                        <button id={`add-${p.id}`} className="btn btn-primary btn-sm" disabled={p.stock_actual === 0} onClick={() => agregarProducto(p)}>
-                          <Plus size={14} />
+                      <td style={{ padding: "16px 24px", textAlign: "right" }}>
+                        <button className="btn btn-primary btn-sm" disabled={p.stock_actual === 0} onClick={() => agregarProducto(p)} style={{ padding: 12, borderRadius: 12 }}>
+                          <Plus size={18} />
                         </button>
                       </td>
                     </tr>
@@ -221,146 +221,122 @@ export default function VentasPage() {
         </div>
 
         {/* Panel derecho: carrito */}
-        <div style={{ display: "flex", flexDirection: "column", padding: 20, gap: 16, border: "2px solid #000000", background: "white", overflow: "visible" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ background: "black", color: "white", padding: "6px 12px", fontSize: 13, fontWeight: 800 }}>CARRITO</div>
-            <span className="badge badge-purple" style={{ marginLeft: "auto", background: "black", color: "white", border: "1px solid black" }}>{cart.length} ITEMS</span>
+        <div className="glass" style={{ display: "flex", flexDirection: "column", padding: 32, borderRadius: 32, gap: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <h3 style={{ fontSize: 18, fontWeight: 900, color: "#0f172a" }}>Dalle de Venta</h3>
+            <span style={{ background: "#6366f1", color: "white", padding: "4px 12px", borderRadius: 10, fontSize: 12, fontWeight: 900 }}>{cart.length} ITEMS</span>
           </div>
 
-          {/* Items del carrito */}
-          <div style={{ flex: 1, overflowY: "auto", minHeight: 150, maxHeight: 400 }}>
+          <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
             {cart.length === 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 120, color: "#94a3b8", gap: 8, border: "1px dashed #cbd5e1" }}>
-                <ShoppingCart size={32} />
-                <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase" }}>Carrito Vacío</span>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#94a3b8", gap: 16 }}>
+                <ShoppingCart size={48} />
+                <span style={{ fontSize: 14, fontWeight: 700 }}>CARRITO VACÍO</span>
               </div>
             ) : cart.map((item) => (
-              <div key={item.id} className="cart-item" style={{ borderBottom: "1.5px solid #e2e8f0" }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "uppercase" }}>{item.nombre}</div>
-                  <div style={{ fontSize: 11, color: "#64748b", fontWeight: 700 }}>RD${item.precio.toFixed(2)}/U</div>
+              <div key={item.id} style={{ display: "flex", gap: 16, padding: 16, background: "#f8fafc", borderRadius: 20, border: "1px solid #eff6ff" }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, color: "#0f172a" }}>{item.nombre.toUpperCase()}</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: "#6366f1" }}>RD${item.precio.toLocaleString()} / UNID.</div>
                 </div>
-                <div className="qty-control" style={{ background: "#f8fafc", padding: "4px" }}>
-                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, -1)} style={{ width: 36, height: 36, fontSize: 18 }}>-</button>
-                  <span style={{ fontSize: 15, fontWeight: 900, minWidth: 28, textAlign: "center" }}>{item.cantidad}</span>
-                  <button className="qty-btn" onClick={() => cambiarCantidad(item.id, 1)} style={{ width: 36, height: 36, fontSize: 18 }}>+</button>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, background: "white", borderRadius: 12, padding: "4px 8px", border: "1px solid #e2e8f0" }}>
+                  <button onClick={() => cambiarCantidad(item.id, -1)} style={{ border: "none", background: "none", cursor: "pointer", padding: 4 }}><Minus size={14} /></button>
+                  <span style={{ fontWeight: 900, minWidth: 20, textAlign: "center" }}>{item.cantidad}</span>
+                  <button onClick={() => cambiarCantidad(item.id, 1)} style={{ border: "none", background: "none", cursor: "pointer", padding: 4 }}><Plus size={14} /></button>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 900, color: "#000000", minWidth: 80, textAlign: "right" }}>
-                  RD${(item.precio * item.cantidad).toFixed(2)}
-                </div>
-                <button className="btn btn-ghost btn-icon" onClick={() => removeItem(item.id)} style={{ padding: 10, background: "#fff1f2", border: "1px solid #fda4af", borderRadius: 0 }}>
-                  <Trash2 size={16} color="#e11d48" />
+                <button onClick={() => removeItem(item.id)} style={{ padding: 10, borderRadius: 12, background: "#fee2e2", border: "none", color: "#ef4444", cursor: "pointer" }}>
+                  <Trash2 size={16} />
                 </button>
               </div>
             ))}
           </div>
 
-          <hr className="divider" />
-
-          {/* Opciones */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div>
-              <label className="label">Cliente</label>
-              <select id="select-cliente" className="select" value={clienteId} onChange={(e) => setClienteId(e.target.value)}>
-                {clientes.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-              </select>
+          <div style={{ background: "#f8fafc", padding: 24, borderRadius: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700, color: "#64748b" }}>
+              <span>SUBTOTAL</span>
+              <span>RD${subtotal.toLocaleString()}</span>
             </div>
-
-            <div>
-              <label className="label">Tipo de Comprobante (NCF)</label>
-              <select id="select-ncf" className="select" value={ncfTipo} onChange={(e) => setNcfTipo(e.target.value as NCFTipo)}>
-                {Object.entries(NCF_LABELS).map(([k, v]) => {
-                  const seq = ncfSecuencias.find((n) => n.tipo === k);
-                  const agotado = seq && seq.secuencia_actual > seq.secuencia_fin;
-                  return <option key={k} value={k} disabled={Boolean(agotado)}>{v} ({k}){agotado ? " - AGOTADO" : ""}</option>;
-                })}
-              </select>
-              {ncfActual && (
-                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>
-                  Próximo: {ncfActual.prefix}{String(ncfActual.secuencia_actual).padStart(8, "0")} | Disponibles: {ncfActual.secuencia_fin - ncfActual.secuencia_actual + 1}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="label">Método de pago</label>
-              <select id="select-pago" className="select" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)}>
-                <option value="efectivo">💵 Efectivo</option>
-                <option value="tarjeta">💳 Tarjeta</option>
-                <option value="transferencia">🏦 Transferencia</option>
-                <option value="credito">📋 Crédito</option>
-              </select>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
-                <input type="checkbox" checked={aplicarItbis} onChange={(e) => setAplicarItbis(e.target.checked)} style={{ width: 16, height: 16, accentColor: "var(--accent)" }} />
-                Aplicar ITBIS (18%)
-              </label>
-            </div>
-
-            <div>
-
-          {error && (
-            <div style={{ display: "flex", gap: 10, padding: "16px", background: "#f8fafc", border: "3px solid #000000", color: "#000000", fontSize: 13, fontWeight: 800 }}>
-              <AlertCircle size={20} style={{ flexShrink: 0 }} />
-              <div>
-                <div style={{ textTransform: "uppercase", marginBottom: 4 }}>ERROR DE SISTEMA</div>
-                <div style={{ fontWeight: 500, lineHeight: 1.4 }}>{error}</div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 700, color: "#64748b" }}>
+              <span>ITBIS (18%)</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input type="checkbox" checked={aplicarItbis} onChange={(e) => setAplicarItbis(e.target.checked)} style={{ width: 18, height: 18, accentColor: "#6366f1" }} />
+                <span>RD${itbisTotal.toLocaleString()}</span>
               </div>
             </div>
-          )}
+            <div style={{ height: 2, background: "#eff6ff" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: "#0f172a" }}>TOTAL A PAGAR</span>
+              <span style={{ fontSize: 32, fontWeight: 900, color: "#6366f1" }}>RD${total.toLocaleString()}</span>
+            </div>
+          </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-            <button id="btn-cobrar" className="btn btn-primary btn-lg" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pagada")} 
-              style={{ justifyContent: "center", background: "#000000", border: "2px solid #000000", borderRadius: 0, fontWeight: 900 }}>
-              {cargando ? "CARGANDO..." : "✓ COBRAR"}
-            </button>
-            <button id="btn-credito" className="btn btn-ghost btn-lg" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pendiente")} 
-              style={{ justifyContent: "center", border: "2px solid #000000", borderRadius: 0, fontWeight: 900, color: "#000000" }}>
-              📋 A CRÉDITO
-            </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div>
+                   <label style={{ fontSize: 10, fontWeight: 900, color: "#94a3b8", display: "block", marginBottom: 8 }}>CLIENTE</label>
+                   <select className="select" value={clienteId} onChange={(e) => setClienteId(e.target.value)} style={{ borderRadius: 14, height: 48, background: "#f8fafc", border: "2px solid #eff6ff" }}>
+                     {clientes.map((c) => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                   </select>
+                </div>
+                <div>
+                   <label style={{ fontSize: 10, fontWeight: 900, color: "#94a3b8", display: "block", marginBottom: 8 }}>MÉTODO DE PAGO</label>
+                   <select className="select" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} style={{ borderRadius: 14, height: 48, background: "#f8fafc", border: "2px solid #eff6ff" }}>
+                     <option value="efectivo">💵 EFECTIVO</option>
+                     <option value="tarjeta">💳 TARJETA</option>
+                     <option value="transferencia">🏦 TRANSFER.</option>
+                     <option value="credito">📋 CRÉDITO</option>
+                   </select>
+                </div>
+             </div>
+
+             <div style={{ position: "relative" }}>
+                <label style={{ fontSize: 10, fontWeight: 900, color: "#94a3b8", display: "block", marginBottom: 8 }}>TIPO DE COMPROBANTE (NCF)</label>
+                <select className="select" value={ncfTipo} onChange={(e) => setNcfTipo(e.target.value as NCFTipo)} style={{ borderRadius: 14, height: 48, background: "#f8fafc", border: "2px solid #eff6ff" }}>
+                  {Object.entries(NCF_LABELS).map(([k, v]) => {
+                    const seq = ncfSecuencias.find((n) => n.tipo === k);
+                    const agotado = seq && seq.secuencia_actual > seq.secuencia_fin;
+                    return <option key={k} value={k} disabled={Boolean(agotado)}>{v} ({k}){agotado ? " - AGOTADO" : ""}</option>;
+                  })}
+                </select>
+             </div>
+
+             {error && <div style={{ background: "#fef2f2", color: "#ef4444", padding: 12, borderRadius: 12, fontSize: 12, fontWeight: 800, textAlign: "center" }}>⚠️ {error.toUpperCase()}</div>}
+
+             <button id="btn-cobrar" className="btn btn-primary" disabled={cargando || cart.length === 0} onClick={() => procesarVenta("pagada")} 
+               style={{ height: 64, borderRadius: 20, fontSize: 18, fontWeight: 900, boxShadow: "0 10px 20px -5px rgba(99,102,241,0.4)" }}>
+               {cargando ? "PROCESANDO..." : "✓ COMPLETAR VENTA"}
+             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal de factura generada */}
       {facturaActual && (
         <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: 450 }}>
+          <div className="modal" style={{ maxWidth: 450, borderRadius: 32, padding: 40 }}>
             <div className="modal-header">
-              <div style={{ padding: "4px 12px", fontSize: 13, fontWeight: 900, letterSpacing: "0.1em", color: "#000000", border: "1px solid #000000", borderRadius: 8 }}>VENTA EXITOSA</div>
-              <button className="btn btn-ghost btn-icon" onClick={() => setFacturaActual(null)}><X size={18} /></button>
+              <span style={{ background: "#f0fdf4", color: "#10b981", padding: "4px 12px", borderRadius: 10, fontSize: 12, fontWeight: 900 }}>EXITO</span>
+              <button onClick={() => setFacturaActual(null)} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={20} /></button>
             </div>
             
             <div style={{ textAlign: "center", padding: "24px 0" }}>
-              <div style={{ 
-                width: 64, height: 64, background: "#f0fdf4", color: "#166534", 
-                borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" 
-              }}>
-                <Check size={32} />
+              <div style={{ width: 80, height: 80, background: "#f0fdf4", color: "#10b981", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+                <Check size={40} />
               </div>
-              <div style={{ fontSize: 24, fontWeight: 900, marginBottom: 4 }}>{facturaActual.ncf}</div>
-              <p style={{ fontSize: 13, color: "#71717a", fontWeight: 800, textTransform: "uppercase" }}>Imprimiendo Ticket Térmico...</p>
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>{facturaActual.ncf}</div>
+              <p style={{ fontSize: 14, color: "#64748b", fontWeight: 500, marginTop: 8 }}>Ticket térmico enviado a la cola de impresión.</p>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
-              <button className="btn btn-primary btn-lg" onClick={() => handlePrint()}
-                style={{ borderRadius: 14, fontWeight: 900, height: 60, fontSize: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <button className="btn btn-primary" onClick={() => handlePrint()} style={{ height: 56, borderRadius: 16, fontWeight: 900 }}>
                 <Printer size={20} /> RE-IMPRIMIR TICKET
               </button>
-              <button className="btn btn-ghost" onClick={() => setFacturaActual(null)} 
-                style={{ borderRadius: 14, fontWeight: 800, height: 48, border: "1.5px solid #f1f5f9" }}>
-                LISTO / NUEVA VENTA
+              <button className="btn btn-ghost" onClick={() => setFacturaActual(null)} style={{ height: 52, borderRadius: 16, fontWeight: 800 }}>
+                CERRAR Y NUEVA VENTA
               </button>
             </div>
 
-            <div style={{ border: "1px solid #f1f5f9", background: "white", overflow: "hidden", height: 250, borderRadius: 16 }}>
-              <div style={{ height: "100%", overflowY: "auto", padding: 10, opacity: 0.5 }}>
-                <div style={{ transform: "scale(0.8)", transformOrigin: "top center" }}>
-                  <PrintInvoice ref={printRef} data={facturaActual} modo="termica" />
-                </div>
-              </div>
+            <div style={{ display: "none" }}>
+              <PrintInvoice ref={printRef} data={facturaActual} modo="termica" />
             </div>
           </div>
         </div>

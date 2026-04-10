@@ -26,14 +26,15 @@ export async function POST(request: NextRequest) {
     });
 
     productos = (result.data as Record<string, unknown>[]).map((row) => ({
-      codigo: row.codigo || row.Codigo,
-      nombre: row.nombre || row.Nombre,
-      precio: parseFloat(String(row.precio || row.Precio || 0)),
-      costo: parseFloat(String(row.costo || row.Costo || 0)),
-      stock_actual: parseInt(String(row.stock || row.Stock || row.stock_actual || 0)),
-      stock_minimo: parseInt(String(row.stock_minimo || row.StockMinimo || 5)),
+      codigo: String(row.codigo || row.Codigo || row.codigo_opcional || ""),
+      nombre: String(row.nombre || row.Nombre || ""),
+      precio: parseFloat(String(row.precio || row.Precio || row.precio_opcional || 0)),
+      costo: parseFloat(String(row.costo || row.Costo || row.costo_opcional || 0)),
+      stock_actual: parseInt(String(row.stock || row.Stock || row.stock_actual || row.stock_actual_opcional || 0)),
+      stock_minimo: parseInt(String(row.stock_minimo || row.StockMinimo || row.stock_minimo_opcional || 5)),
       aplica_itbis: row.itbis !== false && row.aplica_itbis !== false,
-    }));
+      activo: true
+    })).filter(p => p.codigo && p.nombre);
   } else {
     const body = await request.json();
     productos = Array.isArray(body) ? body : [body];

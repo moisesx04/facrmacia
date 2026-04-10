@@ -85,7 +85,7 @@ export default function InventarioPage() {
   }
 
   function descargarPlantilla() {
-    const csv = "codigo,nombre,precio,costo,stock,stock_minimo\nMED001,Amoxicilina 500mg,150.00,80.00,50,10";
+    const csv = "codigo,nombre,precio_opcional,costo_opcional,stock_actual_opcional,stock_minimo_opcional\nMED001,Amoxicilina 500mg,150.00,80.00,50,10\nMED002,Paracetamol 500mg,,,,";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = "plantilla_productos.csv"; a.click();

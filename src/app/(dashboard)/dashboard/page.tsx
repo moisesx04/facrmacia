@@ -9,9 +9,14 @@ import {
   FileText,
   DollarSign,
   Package,
+  ShoppingCart,
+  Users,
+  LayoutDashboard,
+  CheckCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import Link from "next/link";
 
 interface Stats {
   ventasHoy: number;
@@ -186,8 +191,8 @@ export default function DashboardPage() {
                 background: "#ffffff", border: "1px solid #f1f5f9", borderRadius: 28, transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 alignItems: "center"
               }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-12px)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; e.currentTarget.style.borderColor = item.color; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = "translateY(-12px)"; e.currentTarget.style.boxShadow = "var(--shadow-lg)"; e.currentTarget.style.borderColor = item.color; }}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#f1f5f9"; }}
               >
                 <div style={{ width: 72, height: 72, background: item.bg, color: item.color, borderRadius: 22, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 8px 16px -4px ${item.color}33` }}>
                   {item.icon}
