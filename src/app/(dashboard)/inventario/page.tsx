@@ -73,47 +73,107 @@ export default function InventarioPage() {
 
   const bajoStock = productos.filter((p) => p.stock_actual <= p.stock_minimo);
 
-  return (
-    <div className="fade-in">
-      <div className="page-header">
+  return (    <div className="fade-in">
+      <div className="page-header" style={{ marginBottom: 40 }}>
         <div>
-          <h1 className="page-title">Inventario</h1>
-          <p className="page-subtitle">{productos.length} productos · {bajoStock.length} con stock bajo</p>
+          <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Catálogo de Inventario</h1>
+          <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>CONTROL DE EXISTENCIAS Y PRECIOS</p>
         </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          {isAdmin && <>
-            <button id="btn-importar" className="btn btn-ghost" onClick={() => setModal("importar")}><Upload size={16} /> Importar CSV</button>
-            <button id="btn-nuevo-producto" className="btn btn-primary" onClick={() => { setForm(EMPTY); setModal("crear"); }}><Plus size={16} /> Nuevo Producto</button>
-          </>}
+        <div style={{ display: "flex", gap: 16 }}>
+          {isAdmin && (
+            <>
+              <button id="btn-importar" className="btn btn-ghost" onClick={() => setModal("importar")} style={{ borderRadius: 16, height: 56, padding: "0 24px" }}>
+                <Upload size={18} /> IMPORTAR CSV
+              </button>
+              <button id="btn-nuevo-producto" className="btn btn-primary btn-lg" onClick={() => { setForm(EMPTY); setModal("crear"); }} style={{ borderRadius: 18, padding: "0 32px" }}>
+                <Plus size={20} /> NUEVO PRODUCTO
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {bajoStock.length > 0 && (
-        <div style={{ display: "flex", gap: 10, padding: "12px 16px", background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: "var(--radius-sm)", marginBottom: 20, alignItems: "center", fontSize: 13 }}>
-          <AlertTriangle size={16} color="#f59e0b" />
-          <span><strong>{bajoStock.length} productos</strong> por debajo del stock mínimo</span>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+        <div className="glass" style={{ padding: 32, borderRadius: 24 }}>
+          <div className="search-bar" style={{ maxWidth: "100%" }}>
+            <Search size={22} className="search-icon" color="#6366f1" />
+            <input id="buscar-producto" className="input" placeholder="BUSCAR POR NOMBRE O CÓDIGO (F1)..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} 
+              style={{ height: 60, fontSize: 16, paddingLeft: 56, borderRadius: 16, border: "2px solid #eff6ff", background: "#f8fafc" }} />
+          </div>
         </div>
-      )}
+        
+        {bajoStock.length > 0 && (
+          <div style={{ 
+            display: "flex", gap: 20, padding: 32, background: "rgba(245,158,11,0.05)", 
+            border: "2px solid rgba(245,158,11,0.1)", borderRadius: 24, alignItems: "center" 
+          }}>
+            <div style={{ width: 56, height: 56, background: "#fef3c7", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <AlertTriangle size={28} color="#d97706" />
+            </div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#92400e" }}>{bajoStock.length} Alertas</div>
+              <div style={{ fontSize: 13, color: "#b45309", fontWeight: 600 }}>PRODUCTOS CON EXISTENCIAS CRÍTICAS</div>
+            </div>
+          </div>
+        )}
+      </div>
 
-      <div className="glass" style={{ padding: 20, marginBottom: 20 }}>
+      <div className="glass" style={{ borderRadius: 24, overflow: "hidden" }}>
+        <div className="table-container" style={{ border: "none" }}>
+          <table>
+            <thead>
+              <tr>
+                <th style={{ padding: "16px 32px" }}>CÓDIGO</th>
+                <th style={{ padding: "16px 32px" }}>DESCRIPCIÓN</th>
+                <th style={{ padding: "16px 32px" }}>PRECIO VENTA</th>
+                <th style={{ padding: "16px 32px" }}>COSTO</th>
+                <th style={{ padding: "16px 32px" }}>ITBIS</th>
+                <th style={{ padding: "16px 32px" }}>STOCK</th>
+                <th style={{ padding: "16px 32px", textAlign: "right" }}>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? Array.from({ length: 8 }).map((_, i) => (
+                <tr key={i}>{Array.from({ length: 7 }).map((_, j) => <td key={j} style={{ padding: "20px 32px" }}><div className="skeleton" style={{ height: 18 }} /></td>)}</tr>
+              )) : productos.map((p) => {
+                const bajo = p.stock_actual <= p.stock_minimo;
+                return (
                   <tr key={p.id}>
-                    <td><span className="badge badge-info">{p.codigo}</span></td>
-                    <td style={{ fontWeight: 500 }}>{p.nombre}</td>
-                    <td style={{ color: "var(--success)", fontWeight: 600 }}>RD${Number(p.precio).toFixed(2)}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>RD${Number(p.costo).toFixed(2)}</td>
-                    <td><span className={`badge ${p.aplica_itbis ? "badge-warning" : "badge-info"}`}>{p.aplica_itbis ? "18%" : "Exento"}</span></td>
-                    <td>
-                      <span className={`badge ${p.stock_actual === 0 ? "badge-danger" : bajo ? "badge-warning" : "badge-success"}`}>
-                        {p.stock_actual === 0 ? "⚠ Sin stock" : bajo ? `⚠ ${p.stock_actual}` : p.stock_actual}
+                    <td style={{ padding: "20px 32px" }}>
+                      <span style={{ background: "#f1f5f9", padding: "6px 12px", borderRadius: 10, fontSize: 11, fontWeight: 900, color: "#475569" }}>
+                        {p.codigo}
                       </span>
                     </td>
-                    <td style={{ color: "var(--text-muted)" }}>{p.stock_minimo}</td>
-                    {isAdmin && <td>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        <button id={`edit-${p.id}`} className="btn btn-ghost btn-sm btn-icon" onClick={() => { setForm(p); setModal("editar"); }}><Edit2 size={14} /></button>
-                        <button id={`del-${p.id}`} className="btn btn-ghost btn-sm btn-icon" onClick={() => eliminar(p.id)}><Trash2 size={14} color="var(--danger)" /></button>
+                    <td style={{ padding: "20px 32px", fontWeight: 800, color: "#0f172a", fontSize: 14 }}>{p.nombre.toUpperCase()}</td>
+                    <td style={{ padding: "20px 32px", color: "#6366f1", fontWeight: 800 }}>RD${Number(p.precio).toLocaleString()}</td>
+                    <td style={{ padding: "20px 32px", color: "#64748b", fontWeight: 600 }}>RD${Number(p.costo).toLocaleString()}</td>
+                    <td style={{ padding: "20px 32px" }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: p.aplica_itbis ? "#f59e0b" : "#94a3b8" }}>
+                        {p.aplica_itbis ? "18% GRAV." : "EXENTO"}
+                      </span>
+                    </td>
+                    <td style={{ padding: "20px 32px" }}>
+                      <div style={{ 
+                        display: "inline-flex", padding: "6px 14px", borderRadius: 10, fontSize: 13, fontWeight: 900,
+                        background: p.stock_actual === 0 ? "#fef2f2" : bajo ? "#fffbeb" : "#f0fdf4",
+                        color: p.stock_actual === 0 ? "#ef4444" : bajo ? "#d97706" : "#10b981",
+                        border: `1px solid ${p.stock_actual === 0 ? "#fee2e2" : bajo ? "#fef3c7" : "#dcfce7"}`
+                      }}>
+                        {p.stock_actual === 0 ? "AGOTADO" : `${p.stock_actual} UNID.`}
                       </div>
-                    </td>}
+                    </td>
+                    <td style={{ padding: "20px 32px", textAlign: "right" }}>
+                      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+                        <button className="btn btn-ghost btn-sm" onClick={() => { setForm(p); setModal("editar"); }} style={{ background: "#f1f5f9", borderRadius: 10, padding: 10 }}>
+                          <Edit2 size={16} color="#6366f1" />
+                        </button>
+                        {isAdmin && (
+                          <button className="btn btn-ghost btn-sm" onClick={() => eliminar(p.id)} style={{ background: "#fef2f2", borderRadius: 10, padding: 10 }}>
+                            <Trash2 size={16} color="#ef4444" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -122,65 +182,79 @@ export default function InventarioPage() {
         </div>
       </div>
 
-      {/* Modal Crear/Editar */}
+      {/* Modals con estilo premium */}
       {(modal === "crear" || modal === "editar") && (
         <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>{modal === "crear" ? "Nuevo Producto" : "Editar Producto"}</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => setModal(null)}><X size={18} /></button>
+          <div className="modal" style={{ borderRadius: 28, padding: 40, background: "white", maxWidth: 700 }}>
+            <div className="modal-header" style={{ marginBottom: 32 }}>
+              <div style={{ background: "#f1f5f9", padding: "6px 16px", borderRadius: 10, fontSize: 12, fontWeight: 900, color: "#6366f1", letterSpacing: "0.1em" }}>
+                {modal === "crear" ? "NUEVO REGISTRO" : "MODIFICAR PRODUCTO"}
+              </div>
+              <button className="btn btn-ghost btn-icon" onClick={() => setModal(null)} style={{ background: "#f8fafc", borderRadius: 12 }}><X size={20} /></button>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+            
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
               {[
-                { label: "Código", key: "codigo", type: "text" },
-                { label: "Nombre", key: "nombre", type: "text" },
-                { label: "Precio (RD$)", key: "precio", type: "number" },
-                { label: "Costo (RD$)", key: "costo", type: "number" },
-                { label: "Stock Actual", key: "stock_actual", type: "number" },
-                { label: "Stock Mínimo", key: "stock_minimo", type: "number" },
+                { label: "CÓDIGO DE BARRAS", key: "codigo" }, { label: "NOMBRE DEL PRODUCTO", key: "nombre" },
+                { label: "PRECIO VENTA (RD$)", key: "precio", type: "number" }, { label: "COSTO ADQUISICIÓN (RD$)", key: "costo", type: "number" },
+                { label: "STOCK INICIAL", key: "stock_actual", type: "number" }, { label: "ALERTA STOCK MÍNIMO", key: "stock_minimo", type: "number" },
               ].map(({ label, key, type }) => (
                 <div key={key}>
-                  <label className="label" style={{ fontSize: 11, fontWeight: 800 }}>{label}</label>
-                  <input className="input" type={type} value={String(form[key as keyof Producto] || "")}
+                  <label className="label" style={{ fontSize: 11, fontWeight: 800, color: "#64748b", marginBottom: 10 }}>{label}</label>
+                  <input className="input" type={type || "text"} value={String(form[key as keyof Producto] || "")}
                     onChange={(e) => setForm((f) => ({ ...f, [key]: type === "number" ? parseFloat(e.target.value) || 0 : e.target.value }))}
-                    style={{ borderRadius: 0, border: "2px solid #000000" }} />
+                    style={{ background: "#f8fafc", border: "2px solid #eff6ff", borderRadius: 14, height: 52, fontWeight: 600 }} />
                 </div>
               ))}
               <div style={{ gridColumn: "1 / -1" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 13, fontWeight: 700, background: "#f8fafc", padding: "12px", border: "1px solid #000000" }}>
-                  <input type="checkbox" checked={form.aplica_itbis ?? true} onChange={(e) => setForm((f) => ({ ...f, aplica_itbis: e.target.checked }))} style={{ width: 20, height: 20, accentColor: "#000000" }} />
-                  APLICAR ITBIS (18%)
+                <label style={{ 
+                  display: "flex", alignItems: "center", gap: 14, cursor: "pointer", 
+                  background: "#f8fafc", padding: "20px", borderRadius: 18, border: "2px solid #eff6ff" 
+                }}>
+                  <input type="checkbox" checked={form.aplica_itbis ?? true} onChange={(e) => setForm((f) => ({ ...f, aplica_itbis: e.target.checked }))} 
+                    style={{ width: 24, height: 24, accentColor: "#6366f1" }} />
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "#0f172a" }}>APLICAR ITBIS (18% DE IMPUESTO)</span>
                 </label>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={() => setModal(null)}>Cancelar</button>
-              <button id="btn-guardar-producto" className="btn btn-primary" onClick={guardar} disabled={guardando}>{guardando ? "Guardando..." : "Guardar"}</button>
+
+            <div style={{ marginTop: 40, display: "flex", gap: 16 }}>
+              <button className="btn btn-ghost" onClick={() => setModal(null)} style={{ flex: 1, height: 56, borderRadius: 16, fontWeight: 800 }}>CANCELAR</button>
+              <button id="btn-guardar-producto" className="btn btn-primary" onClick={guardar} disabled={guardando} 
+                style={{ flex: 2, height: 56, borderRadius: 16 }}>
+                {guardando ? "GUARDANDO..." : "✓ GUARDAR PRODUCTO"}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal Importar */}
+      {/* Modal Importar refined */}
       {modal === "importar" && (
         <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>Importar Productos (CSV)</h2>
-              <button className="btn btn-ghost btn-icon" onClick={() => { setModal(null); setImportResult(null); }}><X size={18} /></button>
+          <div className="modal" style={{ borderRadius: 28, padding: 40, background: "white", maxWidth: 500 }}>
+            <div className="modal-header" style={{ marginBottom: 32 }}>
+               <h3 style={{ fontSize: 13, fontWeight: 900, color: "#6366f1", letterSpacing: "0.1em" }}>IMPORTACIÓN MASIVA</h3>
+               <button className="btn btn-ghost btn-icon" onClick={() => { setModal(null); setImportResult(null); }}><X size={20} /></button>
             </div>
-            <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 16 }}>
-              Sube un archivo CSV con los campos: <code>codigo, nombre, precio, costo, stock, stock_minimo</code>
+            
+            <p style={{ color: "#64748b", fontSize: 14, fontWeight: 500, lineHeight: 1.6, marginBottom: 24 }}>
+              Sube un archivo **CSV** para cargar múltiples productos simultáneamente. Asegúrate de seguir la estructura de la plantilla oficial.
             </p>
-            <button className="btn btn-ghost" style={{ marginBottom: 16 }} onClick={descargarPlantilla}><Download size={16} /> Descargar Plantilla</button>
-            <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={importarCSV} />
-            <button id="btn-seleccionar-csv" className="btn btn-primary w-full" style={{ justifyContent: "center" }} onClick={() => fileRef.current?.click()} disabled={importLoading}>
-              <Upload size={16} /> {importLoading ? "Importando..." : "Seleccionar archivo CSV"}
+            
+            <button className="btn btn-ghost" onClick={descargarPlantilla} style={{ width: "100%", height: 52, borderRadius: 14, marginBottom: 12, border: "2px solid #eff6ff" }}>
+              <Download size={18} /> DESCARGAR PLANTILLA
             </button>
+            
+            <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={importarCSV} />
+            <button className="btn btn-primary" onClick={() => fileRef.current?.click()} disabled={importLoading} style={{ width: "100%", height: 56, borderRadius: 16 }}>
+              <Upload size={18} /> {importLoading ? "IMPORTANDO..." : "SUBIR ARCHIVO CSV"}
+            </button>
+            
             {importResult && (
-              <div style={{ marginTop: 16, padding: 14, background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)", borderRadius: "var(--radius-sm)" }}>
-                <div style={{ color: "var(--success)", fontWeight: 600 }}>✅ {importResult.insertados} productos importados</div>
-                {importResult.errores.length > 0 && <div style={{ color: "var(--danger)", marginTop: 8, fontSize: 12 }}>{importResult.errores.join(", ")}</div>}
+              <div style={{ marginTop: 24, padding: 20, background: "#f0fdf4", border: "2px solid #dcfce7", borderRadius: 18 }}>
+                <div style={{ color: "#166534", fontWeight: 800 }}>✅ {importResult.insertados} PRODUCTOS CARGADOS</div>
+                {importResult.errores.length > 0 && <div style={{ color: "#991b1b", marginTop: 10, fontSize: 12, fontFamily: "monospace" }}>{importResult.errores.join(", ")}</div>}
               </div>
             )}
           </div>

@@ -46,59 +46,83 @@ export default function ConfiguracionPage() {
 
   return (
     <div className="fade-in">
-      <div className="page-header">
+      <div className="page-header" style={{ marginBottom: 40 }}>
         <div>
-          <h1 className="page-title">Configuración</h1>
-          <p className="page-subtitle">Gestión de secuencias NCF y parámetros del sistema</p>
+          <h1 className="page-title" style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-0.05em", color: "#0f172a" }}>Configuración Avanzada</h1>
+          <p className="page-subtitle" style={{ fontWeight: 600, color: "#64748b" }}>GESTIÓN DE SECUENCIAS FISCALES Y PARÁMETROS</p>
         </div>
-        <button className="btn btn-ghost" onClick={cargar}>
-          <RefreshCw size={16} /> Actualizar
+        <button className="btn btn-ghost" onClick={cargar} style={{ height: 56, borderRadius: 16, border: "2px solid #eff6ff" }}>
+          <RefreshCw size={18} /> ACTUALIZAR DATOS
         </button>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <div className="glass" style={{ padding: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <Settings size={18} color="var(--accent-light)" />
-            <h2 style={{ fontSize: 16, fontWeight: 700 }}>Secuencias NCF (Comprobantes Fiscales)</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+        <div className="glass" style={{ padding: 40, borderRadius: 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 32 }}>
+             <div style={{ width: 40, height: 40, background: "#f5f3ff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>
+               <Settings size={22} color="#6366f1" />
+             </div>
+             <h2 style={{ fontSize: 18, fontWeight: 900, color: "#0f172a" }}>Secuencias NCF (Comprobantes Fiscales)</h2>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {loading ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="skeleton" style={{ height: 100, borderRadius: "var(--radius-sm)" }} />
+              <div key={i} className="skeleton" style={{ height: 120, borderRadius: 20 }} />
             )) : secuencias.map((seq) => {
               const disponibles = seq.secuencia_fin - seq.secuencia_actual + 1;
               const agotado = disponibles <= 0;
+              const critico = disponibles < 100;
+              
               return (
-                <div key={seq.id} style={{
-                  padding: 20, borderRadius: "var(--radius-sm)",
-                  border: `1px solid ${agotado ? "rgba(239,68,68,0.3)" : "var(--border)"}`,
-                  background: agotado ? "rgba(239,68,68,0.05)" : "var(--bg-card)",
+                <div key={seq.id} className="glass" style={{
+                  padding: 32, borderRadius: 24, border: agotado ? "2px solid #fee2e2" : "1px solid #f1f5f9",
+                  background: agotado ? "linear-gradient(to right, #fef2f2, #fff)" : "white",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
                 }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-                    <div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                        <span className="badge badge-purple">{seq.tipo}</span>
-                        <span style={{ fontSize: 15, fontWeight: 700 }}>{NCF_NOMBRES[seq.tipo] || seq.tipo}</span>
-                        {agotado && <span className="badge badge-danger">AGOTADO</span>}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
+                    <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+                      <div style={{ 
+                        width: 64, height: 64, background: "#f1f5f9", borderRadius: 16, 
+                        display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: "#6366f1" 
+                      }}>
+                        {seq.tipo}
                       </div>
-                      <div style={{ fontSize: 13, color: "var(--text-secondary)", display: "flex", gap: 20, flexWrap: "wrap" }}>
-                        <span>Prefijo: <strong>{seq.prefix}</strong></span>
-                        <span>Actual: <strong>{seq.secuencia_actual}</strong></span>
-                        <span>Fin: <strong>{seq.secuencia_fin}</strong></span>
-                        <span>Disponibles: <strong style={{ color: agotado ? "var(--danger)" : disponibles < 100 ? "var(--warning)" : "var(--success)" }}>{Math.max(0, disponibles)}</strong></span>
-                        <span>Vence: <strong>{seq.vencimiento}</strong></span>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                          <span style={{ fontSize: 18, fontWeight: 900, color: "#0f172a" }}>{NCF_NOMBRES[seq.tipo] || seq.tipo}</span>
+                          {agotado ? (
+                            <span style={{ background: "#ef4444", color: "white", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 900 }}>AGOTADO</span>
+                          ) : critico && (
+                            <span style={{ background: "#f59e0b", color: "white", padding: "4px 10px", borderRadius: 8, fontSize: 10, fontWeight: 900 }}>RECARGA NECESARIA</span>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+                           <div style={{ display: "flex", flexDirection: "column" }}>
+                              <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8" }}>PREFIJO</span>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: "#475569" }}>{seq.prefix}</span>
+                           </div>
+                           <div style={{ display: "flex", flexDirection: "column" }}>
+                              <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8" }}>DISPONIBLES</span>
+                              <span style={{ fontSize: 14, fontWeight: 900, color: agotado ? "#ef4444" : critico ? "#d97706" : "#10b981" }}>{Math.max(0, disponibles)}</span>
+                           </div>
+                           <div style={{ display: "flex", flexDirection: "column" }}>
+                              <span style={{ fontSize: 10, fontWeight: 800, color: "#94a3b8" }}>VENCIMIENTO</span>
+                              <span style={{ fontSize: 14, fontWeight: 800, color: "#475569" }}>{seq.vencimiento}</span>
+                           </div>
+                        </div>
                       </div>
                     </div>
-                    <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-                      <div>
-                        <label className="label" style={{ fontSize: 11 }}>Nuevo límite</label>
-                        <input className="input" type="number" style={{ width: 140 }}
+
+                    <div style={{ display: "flex", gap: 16, alignItems: "flex-end", background: "#f8fafc", padding: 20, borderRadius: 20 }}>
+                      <div style={{ flex: 1 }}>
+                        <label className="label" style={{ fontSize: 10, fontWeight: 900, color: "#64748b", marginBottom: 8 }}>AJUSTAR LÍMITE FINAL</label>
+                        <input className="input" type="number" style={{ width: 160, height: 48, borderRadius: 12, border: "2px solid #eff6ff", fontWeight: 800 }}
                           value={seq.secuencia_fin}
                           onChange={(e) => setSecuencias((prev) => prev.map((s) => s.id === seq.id ? { ...s, secuencia_fin: parseInt(e.target.value) || s.secuencia_fin } : s))} />
                       </div>
-                      <button id={`guardar-ncf-${seq.id}`} className="btn btn-primary btn-sm" onClick={() => actualizar(seq)} disabled={guardando === seq.id}>
-                        {guardando === seq.id ? "..." : "Guardar"}
+                      <button id={`guardar-ncf-${seq.id}`} className="btn btn-primary" onClick={() => actualizar(seq)} disabled={guardando === seq.id}
+                        style={{ height: 48, padding: "0 24px", borderRadius: 12 }}>
+                        {guardando === seq.id ? "..." : "✓ ACTUALIZAR"}
                       </button>
                     </div>
                   </div>
@@ -106,6 +130,22 @@ export default function ConfiguracionPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* Sección Informativa Adicional */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+           <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #6366f1" }}>
+              <h4 style={{ fontWeight: 900, fontSize: 14, color: "#0f172a", marginBottom: 12 }}>REGLAS DE VALIDACIÓN DGII</h4>
+              <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
+                Las secuencias NCF deben ser solicitadas y aprobadas por la DGII. Una vez agotado el límite fin, el sistema bloqueará la emisión para ese tipo de comprobante hasta que se actualice el rango.
+              </p>
+           </div>
+           <div className="glass" style={{ padding: 32, borderRadius: 24, borderLeft: "6px solid #10b981" }}>
+              <h4 style={{ fontWeight: 900, fontSize: 14, color: "#0f172a", marginBottom: 12 }}>INTEGRIDAD DE DATOS</h4>
+              <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.6 }}>
+                El sistema mantiene una trazabilidad completa de cada NCF emitido. Los cambios en los límites no afectan las facturas ya creadas, solo las futuras.
+              </p>
+           </div>
         </div>
       </div>
     </div>
