@@ -78,16 +78,16 @@ export default function DashboardPage() {
       {/* KPI Cards */}
       {isAdmin ? (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20, marginBottom: 32 }}>
-          <StatCard loading={loading} icon={<DollarSign size={22} color="#10b981" />} iconBg="rgba(16,185,129,0.15)"
+          <StatCard loading={loading} icon={<DollarSign size={22} color="#ffffff" />} iconBg="rgba(255,255,255,0.1)"
             value={`RD$${stats?.totalHoy.toLocaleString("es-DO", { minimumFractionDigits: 2 }) || "0.00"}`}
-            label="Ventas de Hoy" accent="#10b981" />
-          <StatCard loading={loading} icon={<FileText size={22} color="#6366f1" />} iconBg="rgba(99,102,241,0.15)"
-            value={String(stats?.ventasHoy || 0)} label="Facturas Hoy" accent="#6366f1" />
-          <StatCard loading={loading} icon={<TrendingUp size={22} color="#3b82f6" />} iconBg="rgba(59,130,246,0.15)"
+            label="Ventas de Hoy" accent="#ffffff" />
+          <StatCard loading={loading} icon={<FileText size={22} color="#ffffff" />} iconBg="rgba(255,255,255,0.1)"
+            value={String(stats?.ventasHoy || 0)} label="Facturas Hoy" accent="#ffffff" />
+          <StatCard loading={loading} icon={<TrendingUp size={22} color="#ffffff" />} iconBg="rgba(255,255,255,0.1)"
             value={`RD$${stats?.totalMes.toLocaleString("es-DO", { minimumFractionDigits: 2 }) || "0.00"}`}
-            label="Ventas del Mes" accent="#3b82f6" />
-          <StatCard loading={loading} icon={<AlertTriangle size={22} color="#f59e0b" />} iconBg="rgba(245,158,11,0.15)"
-            value={String(stats?.productosStockBajo || 0)} label="Stock Bajo" accent="#f59e0b"
+            label="Ventas del Mes" accent="#ffffff" />
+          <StatCard loading={loading} icon={<AlertTriangle size={22} color="#ffffff" />} iconBg="rgba(255,255,255,0.2)"
+            value={String(stats?.productosStockBajo || 0)} label="Stock Bajo" accent="#ffffff"
             alert={stats?.productosStockBajo ? stats.productosStockBajo > 0 : false} />
         </div>
       ) : (

@@ -55,37 +55,39 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
         />
       )}
 
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      <aside className={`sidebar ${isOpen ? "open" : ""}`} style={{
+        background: "var(--bg-secondary)",
+        borderRight: "1px solid var(--border)",
+      }}>
         {/* Logo */}
         <div style={{ padding: "24px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
-              width: 40, height: 40, borderRadius: 12,
-              background: "linear-gradient(135deg, var(--accent), var(--accent-dark))",
+              width: 40, height: 40, borderRadius: 0,
+              background: "var(--accent)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 4px 15px var(--accent-glow)", flexShrink: 0
+              boxShadow: "0 0 0 1px var(--accent)", flexShrink: 0
             }}>
-              <Pill size={20} color="white" />
+              <Pill size={20} color="black" />
             </div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 15, lineHeight: 1.2 }}>FarmaSystem</div>
-              <div style={{ fontSize: 11, color: "var(--accent-light)", fontWeight: 600 }}>PRO</div>
+              <div style={{ fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.5px", color: "var(--text-primary)" }}>FARMASYSTEM</div>
+              <div style={{ fontSize: 10, color: "var(--text-secondary)", fontWeight: 700, letterSpacing: "1px" }}>PRO CORE</div>
             </div>
           </div>
           
-          {/* Botón cerrar para móvil dentro del logo (opcional) */}
           <button 
             onClick={() => setIsOpen(false)}
             style={{ background: "transparent", border: "none", color: "var(--text-secondary)", cursor: "pointer", display: "inline-flex" }}
             className="md-hidden"
           >
-            <ChevronRight size={20} style={{ transform: "rotate(180deg)" }} />
+            <X size={20} />
           </button>
         </div>
 
         {/* Nav */}
         <nav style={{ flex: 1, padding: "16px 12px", overflowY: "auto" }}>
-          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 4 }}>
+          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 2 }}>
             {filtered.map((item) => {
               const active = pathname === item.href || pathname.startsWith(item.href + "/");
               const Icon = item.icon;
@@ -95,21 +97,21 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
                     href={item.href}
                     style={{
                       display: "flex", alignItems: "center", gap: 12,
-                      padding: "10px 14px", borderRadius: "var(--radius-sm)",
+                      padding: "12px 14px", borderRadius: 0,
                       textDecoration: "none",
-                      color: active ? "white" : "var(--text-secondary)",
-                      background: active ? "linear-gradient(135deg, var(--accent), var(--accent-dark))" : "transparent",
-                      boxShadow: active ? "0 4px 15px var(--accent-glow)" : "none",
-                      fontWeight: active ? 600 : 400,
+                      color: active ? "var(--bg-primary)" : "var(--text-secondary)",
+                      background: active ? "var(--accent)" : "transparent",
+                      fontWeight: active ? 700 : 500,
                       fontSize: 14,
                       transition: "var(--transition)",
                       position: "relative",
+                      border: active ? "none" : "1px solid transparent",
                     }}
-                    onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = "var(--bg-card)"; (e.currentTarget as HTMLElement).style.color = "white"; }}
-                    onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; } }}
+                    onMouseEnter={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "var(--bg-card)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border)"; } }}
+                    onMouseLeave={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; (e.currentTarget as HTMLElement).style.borderColor = "transparent"; } }}
                   >
                     <Icon size={18} />
-                    <span style={{ flex: 1 }}>{item.label}</span>
+                    <span style={{ flex: 1, textTransform: "uppercase", letterSpacing: "0.5px" }}>{item.label}</span>
                     {active && <ChevronRight size={14} />}
                   </Link>
                 </li>
@@ -120,24 +122,25 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
 
         {/* User + Logout */}
         <div style={{ padding: "16px 12px", borderTop: "1px solid var(--border)" }}>
-          <div style={{ padding: "12px 14px", borderRadius: "var(--radius-sm)", marginBottom: 8, background: "var(--bg-card)" }}>
+          <div style={{ padding: "14px", border: "1px solid var(--border)", marginBottom: 8, background: "var(--bg-card)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{
-                width: 36, height: 36, borderRadius: "50%",
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                width: 36, height: 36, borderRadius: 0,
+                background: "var(--accent)",
+                color: "var(--bg-primary)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 14, fontWeight: 700, flexShrink: 0,
+                fontSize: 14, fontWeight: 800, flexShrink: 0,
               }}>
                 {userName?.charAt(0).toUpperCase()}
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userName}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textTransform: "uppercase" }}>{userName}</div>
                 <div style={{ fontSize: 11, color: "var(--text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail}</div>
               </div>
             </div>
             <div style={{ marginTop: 8 }}>
-              <span className={`badge ${role === "admin" ? "badge-purple" : "badge-info"}`} style={{ fontSize: 11 }}>
-                {role === "admin" ? "👑 Admin" : "🛒 Vendedor"}
+              <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", padding: "2px 6px", border: "1px solid var(--border)", color: "var(--text-primary)" }}>
+                {role === "admin" ? "ADMINISTRADOR" : "VENDEDOR"}
               </span>
             </div>
           </div>
@@ -145,7 +148,7 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
             id="btn-logout"
             onClick={() => signOut({ callbackUrl: "/login" })}
             className="btn btn-ghost w-full"
-            style={{ justifyContent: "center", gap: 8 }}
+            style={{ justifyContent: "center", gap: 8, borderRadius: 0, border: "1px solid var(--border)", textTransform: "uppercase", fontSize: 12, fontWeight: 700 }}
           >
             <LogOut size={16} /> Cerrar Sesión
           </button>

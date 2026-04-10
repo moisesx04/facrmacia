@@ -4,38 +4,38 @@
    DESIGN TOKENS
    ============================================================ */
 :root {
-  --bg-primary: #0a0f1e;
-  --bg-secondary: #0d1526;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --bg-card-hover: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.18);
+  --bg-primary: #000000;
+  --bg-secondary: #050505;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.2);
 
-  --accent: #6366f1;
-  --accent-light: #818cf8;
-  --accent-dark: #4f46e5;
-  --accent-glow: rgba(99, 102, 241, 0.35);
+  --accent: #ffffff;
+  --accent-light: #f1f5f9;
+  --accent-dark: #cbd5e1;
+  --accent-glow: rgba(255, 255, 255, 0.15);
 
-  --success: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.3);
-  --warning: #f59e0b;
-  --warning-glow: rgba(245, 158, 11, 0.3);
-  --danger: #ef4444;
-  --danger-glow: rgba(239, 68, 68, 0.3);
-  --info: #3b82f6;
+  --success: #e2e8f0;
+  --success-glow: rgba(255, 255, 255, 0.1);
+  --warning: #94a3b8;
+  --warning-glow: rgba(255, 255, 255, 0.08);
+  --danger: #ffffff;
+  --danger-glow: rgba(255, 255, 255, 0.2);
+  --info: #cbd5e1;
 
-  --text-primary: #f1f5f9;
+  --text-primary: #ffffff;
   --text-secondary: #94a3b8;
   --text-muted: #475569;
 
   --sidebar-width: 260px;
   --header-height: 64px;
-  --radius: 14px;
-  --radius-sm: 8px;
-  --radius-lg: 20px;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius: 0px; /* Squared for a more industrial B/W look */
+  --radius-sm: 0px;
+  --radius-lg: 0px;
+  --shadow: 0 4px 0px rgba(255, 255, 255, 0.1);
+  --shadow-lg: 0 8px 0px rgba(255, 255, 255, 0.15);
+  --transition: all 0.15s ease-in-out;
 }
 
 /* ============================================================
@@ -148,8 +148,8 @@ body {
 
 .input:focus, .select:focus, .textarea:focus {
   border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.08);
-  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .input::placeholder { color: var(--text-muted); }
@@ -192,11 +192,11 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
   font-size: 12px;
   font-weight: 600;
 }
-.badge-success { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
-.badge-warning { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
-.badge-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
-.badge-info { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
-.badge-purple { background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+.badge-success { background: #ffffff; color: #000000; border: 1px solid #ffffff; }
+.badge-warning { background: #94a3b8; color: #000000; border: 1px solid #94a3b8; }
+.badge-danger { background: #000000; color: #ffffff; border: 1px solid #ffffff; }
+.badge-info { background: #475569; color: #ffffff; border: 1px solid #475569; }
+.badge-purple { background: #ffffff; color: #000000; border: 1px solid #ffffff; }
 
 /* ============================================================
    MODALS
@@ -213,7 +213,7 @@ tbody td { padding: 13px 16px; font-size: 14px; color: var(--text-primary); }
   animation: fadeIn 0.15s ease;
 }
 .modal {
-  background: #111827;
+  background: #050505;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 28px;
