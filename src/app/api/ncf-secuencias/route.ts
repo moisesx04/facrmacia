@@ -18,6 +18,20 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(data);
 }
 
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session || session.user.role !== "admin") {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
+  const db = supabaseAdmin();
+  const body = await request.json();
+  
+  const { data, error } = await db.from("ncf_secuencias").insert([body]).select().single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json(data, { status: 201 });
+}
+
 export async function PUT(request: NextRequest) {
   const session = await auth();
   if (!session || session.user.role !== "admin") {
@@ -26,7 +40,7 @@ export async function PUT(request: NextRequest) {
 
   const db = supabaseAdmin();
   const body = await request.json();
-  const { id, ...updates } = body;
+  const { id, created_at, ...updates } = body;
   const { data, error } = await db.from("ncf_secuencias").update(updates).eq("id", id).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);

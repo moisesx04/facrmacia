@@ -40,20 +40,49 @@ export async function POST(request: NextRequest) {
     productos = Array.isArray(body) ? body : [body];
   }
 
-  // Batch insert en chunks de 100
+  // 1. Obtener todos los códigos para verificar existencia
+  const codigos = productos.map(p => String(p.codigo));
+  const { data: existentes } = await db
+    .from("productos")
+    .select("codigo, precio, costo, stock_actual, stock_minimo")
+    .in("codigo", codigos);
+
+  const existingMap = new Map(existentes?.map(e => [e.codigo, e]));
+
+  // 2. Mezcla inteligente (Smart Merge)
+  const finalProductos = productos.map(p => {
+    const dbProd = existingMap.get(String(p.codigo));
+    if (!dbProd) return p; // Es nuevo, usar tal cual
+
+    return {
+      ...p,
+      // Solo sobrescribir si el CSV trae un valor > 0, de lo contrario mantener el de la DB
+      precio: (Number(p.precio) > 0) ? p.precio : dbProd.precio,
+      costo: (Number(p.costo) > 0) ? p.costo : dbProd.costo,
+      stock_actual: (Number(p.stock_actual) > 0) ? p.stock_actual : dbProd.stock_actual,
+      stock_minimo: (Number(p.stock_minimo) > 5) ? p.stock_minimo : dbProd.stock_minimo,
+      updated_at: new Date().toISOString()
+    };
+  });
+
+  // Batch insert/upsert en chunks de 100
   const CHUNK = 100;
   let insertados = 0;
   const errores: string[] = [];
 
-  for (let i = 0; i < productos.length; i += CHUNK) {
-    const chunk = productos.slice(i, i + CHUNK);
+  for (let i = 0; i < finalProductos.length; i += CHUNK) {
+    const chunk = finalProductos.slice(i, i + CHUNK);
     const { data: inserted, error } = await db
       .from("productos")
       .upsert(chunk, { onConflict: "codigo" })
       .select("id");
 
-    if (error) errores.push(error.message);
-    else insertados += inserted?.length || chunk.length;
+    if (error) {
+      console.error("Bulk Error:", error);
+      errores.push(error.message);
+    } else {
+      insertados += inserted?.length || chunk.length;
+    }
   }
 
   return NextResponse.json({ insertados, errores });
