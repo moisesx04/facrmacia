@@ -65,8 +65,8 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
   if (isTermica) {
     return (
       <div ref={ref} style={s}>
-        <div style={{ textAlign: "center", fontWeight: 700, fontSize: 13 }}>FARMACIA</div>
-        <div style={{ textAlign: "center", fontSize: 10 }}>FarmaSystem Pro</div>
+        <div style={{ textAlign: "center", fontWeight: 700, fontSize: 13 }}>FARMACIA ARCHI DOMINICANA</div>
+        <div style={{ textAlign: "center", fontSize: 10 }}>Software de Gestión v8</div>
         {hr()}
         <div style={{ textAlign: "center", fontSize: 10 }}>
           <div>{NCF_NOMBRES[data.ncf_tipo] || data.ncf_tipo}</div>
@@ -109,8 +109,8 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
     <div ref={ref} style={{ ...s, fontSize: 13 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 900, fontFamily: "sans-serif" }}>💊 FarmaSystem Pro</div>
-          <div style={{ fontSize: 11, color: "#555" }}>Sistema de Facturación Farmacéutica</div>
+          <div style={{ fontSize: 24, fontWeight: 900, fontFamily: "sans-serif" }}>💊 ARCHI DOMINICANA</div>
+          <div style={{ fontSize: 11, color: "#555" }}>Software de Gestión Farmacéutica</div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div style={{ fontSize: 11, color: "#555" }}>Comprobante Fiscal</div>
@@ -169,7 +169,7 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
       </div>
 
       <div style={{ marginTop: 40, borderTop: "1px dashed #ccc", paddingTop: 12, fontSize: 11, color: "#666", textAlign: "center" }}>
-        Este comprobante es válido como constancia de compra. Generado por FarmaSystem Pro.
+        Este comprobante es válido como constancia de compra. Generado por FARMACIA ARCHI DOMINICANA.
       </div>
     </div>
   );

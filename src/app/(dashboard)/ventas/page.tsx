@@ -7,7 +7,7 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, Check, CreditCard }
 import { PrintInvoice, type InvoiceData } from "@/components/PrintInvoice";
 import { NCF_LABELS, type NCFTipo } from "@/lib/ncf";
 
-interface Producto { id: string; codigo: string; nombre: string; precio: number; precioOriginal?: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
+interface Producto { id: string; codigo: string; nombre: string; laboratorio?: string; precio: number; precioOriginal?: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
 interface CartItem extends Producto { cantidad: number; precioOriginal: number; }
 interface Cliente { id: string; nombre: string; cedula_rnc?: string }
 interface NCFSecuencia { id: string; tipo: NCFTipo; prefix: string; secuencia_actual: number; secuencia_fin: number }
@@ -145,10 +145,13 @@ export default function VentasPage() {
                   {productos.map((p) => (
                     <tr key={p.id} style={{ cursor: "pointer" }} onClick={() => agregarProducto(p)}>
                       <td style={{ color: "var(--text-muted)", fontSize: 13 }}>{p.codigo}</td>
-                      <td style={{ fontWeight: 500 }}>{p.nombre}</td>
+                      <td style={{ fontWeight: 500 }}>
+                        <div>{p.nombre}</div>
+                        {p.laboratorio && <div style={{ fontSize: 11, color: "var(--accent)", fontWeight: 500 }}>{p.laboratorio}</div>}
+                      </td>
                       <td style={{ fontWeight: 500 }}>RD${p.precio.toLocaleString()}</td>
                       <td>
-                        <span className={`badge ${p.stock_actual <= 5 ? 'badge-danger' : 'badge-neutral'}`}>
+                        <span className={`badge ${p.stock_actual <= 20 ? 'badge-danger' : 'badge-neutral'}`}>
                            {p.stock_actual > 0 ? p.stock_actual : "Agotado"}
                         </span>
                       </td>
@@ -177,7 +180,10 @@ export default function VentasPage() {
                 <div key={item.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
                   {/* Fila 1: Nombre + eliminar */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, flex: 1, marginRight: 8 }}>{item.nombre}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, flex: 1, marginRight: 8 }}>
+                      {item.nombre}
+                      {item.laboratorio && <span style={{ fontSize: 10, color: "var(--accent)", marginLeft: 6 }}>({item.laboratorio})</span>}
+                    </div>
                     <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="btn btn-ghost" style={{ padding: 4, color: "var(--danger)", flexShrink: 0 }}><Trash2 size={13}/></button>
                   </div>
                   {/* Fila 2: precio editable + cantidad + subtotal */}

@@ -64,8 +64,8 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
             <Pill size={20} color="#ffffff" />
           </div>
           <div>
-            <h1 style={{ color: "#0f172a", fontSize: 15, fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>FarmaSystem</h1>
-            <p style={{ color: "#64748b", fontSize: 11, fontWeight: 500, margin: 0 }}>PLATFORM V8</p>
+            <h1 style={{ color: "#0f172a", fontSize: 13, fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>FARMACIA ARCHI DOMINICANA</h1>
+            <p style={{ color: "#64748b", fontSize: 10, fontWeight: 500, margin: 0 }}>SOFTWARE DE GESTIÓN</p>
           </div>
         </div>
 

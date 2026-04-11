@@ -66,32 +66,41 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Smart Merge con Existentes (Protección de Integridad)
-    const { data: existentes } = await db.from("productos").select("id, codigo, nombre, precio, stock_actual");
+    const { data: existentes } = await db.from("productos").select("id, codigo, nombre, laboratorio, precio, stock_actual, fecha_vencimiento");
     const existingByCode = new Map(existentes?.map(e => [String(e.codigo).toLowerCase().trim(), e]));
-    const existingByName = new Map(existentes?.map(e => [String(e.nombre).toLowerCase().trim(), e]));
+    
+    // De-duplicar por Nombre + Laboratorio
+    const existingByNamaAndLab = new Map(existentes?.map(e => [
+      `${String(e.nombre).toLowerCase().trim()}|${String(e.laboratorio || "").toLowerCase().trim()}`, 
+      e
+    ]));
 
     // De-duplicar el propio batch entrante para evitar conflictos internos
-    const seenNames = new Set();
+    const seenCombos = new Set();
     const uniqueInput = productos.filter(p => {
-      const slug = String(p.nombre).toLowerCase().trim();
-      if (seenNames.has(slug)) return false;
-      seenNames.add(slug);
+      const slug = `${String(p.nombre).toLowerCase().trim()}|${String(p.laboratorio || "").toLowerCase().trim()}`;
+      if (seenCombos.has(slug)) return false;
+      seenCombos.add(slug);
       return true;
     });
 
     const finalBatch = uniqueInput.map(p => {
       const nombre = String(p.nombre).trim();
       const codigo = String(p.codigo).trim();
+      const laboratorio = String(p.laboratorio || "").trim();
       
       let dbProd = null;
       if (codigo) dbProd = existingByCode.get(codigo.toLowerCase());
-      if (!dbProd && nombre) dbProd = existingByName.get(nombre.toLowerCase());
+      if (!dbProd && nombre) {
+        dbProd = existingByNamaAndLab.get(`${nombre.toLowerCase()}|${laboratorio.toLowerCase()}`);
+      }
 
       if (!dbProd) {
         // Nuevo producto: Generar metadatos robustos
         return {
           ...p,
           nombre: nombre,
+          laboratorio: laboratorio,
           codigo: codigo || `MED-${Math.random().toString(36).substring(2, 7).toUpperCase()}-${Date.now().toString().slice(-4)}`,
           itbis: 0.18, 
           aplica_itbis: true, 
@@ -102,9 +111,11 @@ export async function POST(request: NextRequest) {
       // Existe -> Smart Merge (No sobrescribir con ceros/vacíos accidentales)
       return {
         ...dbProd,
-        nombre: nombre || dbProd.nombre, // Preferir nombre limpio del batch
+        nombre: nombre || dbProd.nombre,
+        laboratorio: laboratorio || dbProd.laboratorio,
         precio: (Number(p.precio) > 0) ? p.precio : dbProd.precio,
         stock_actual: (Number(p.stock_actual) > 0) ? p.stock_actual : dbProd.stock_actual,
+        fecha_vencimiento: p.fecha_vencimiento || dbProd.fecha_vencimiento,
         updated_at: new Date().toISOString()
       };
     });

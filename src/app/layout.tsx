@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FarmaSystem Pro — Sistema de Facturación",
+  title: "FARMACIA ARCHI DOMINICANA — Sistema de Facturación",
   description: "Sistema POS y facturación fiscal profesional para farmacias",
 };
 

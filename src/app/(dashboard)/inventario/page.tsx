@@ -8,6 +8,8 @@ interface Producto {
   id: string;
   codigo: string;
   nombre: string;
+  laboratorio?: string;
+  fecha_vencimiento?: string;
   precio: number;
   costo: number;
   itbis: number;
@@ -20,6 +22,8 @@ interface Producto {
 const EMPTY: Partial<Producto> = {
   codigo: "",
   nombre: "",
+  laboratorio: "",
+  fecha_vencimiento: "",
   precio: 0,
   costo: 0,
   itbis: 0.18,
@@ -304,9 +308,10 @@ export default function InventarioPage() {
             <thead>
               <tr>
                 <th>SKU</th>
-                <th>Producto</th>
+                <th>Producto / Laboratorio</th>
                 <th>Precio</th>
                 <th>Estado</th>
+                <th>Vencimiento</th>
                 {isAdmin && <th style={{ textAlign: "right" }}>Acciones</th>}
               </tr>
             </thead>
@@ -319,23 +324,46 @@ export default function InventarioPage() {
                 </tr>
               )) : productos.map((p) => {
                 const isAgotado = p.stock_actual === 0;
-                const isBajo = p.stock_actual > 0 && p.stock_actual <= p.stock_minimo;
+                const isCritico = p.stock_actual > 0 && p.stock_actual <= 20; // Alerta <= 20
+                const isBajo = p.stock_actual > 20 && p.stock_actual <= p.stock_minimo;
                 const sinPrecio = Number(p.precio) <= 0;
+                
+                // Lógica de vencimiento
+                const fechaVenc = p.fecha_vencimiento ? new Date(p.fecha_vencimiento) : null;
+                const hoy = new Date();
+                const diffDias = fechaVenc ? Math.ceil((fechaVenc.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)) : null;
+                const proximoAVencer = diffDias !== null && diffDias <= 30 && diffDias > 0;
+                const vencido = diffDias !== null && diffDias <= 0;
+
                 return (
-                  <tr key={p.id}>
+                  <tr key={p.id} style={{ background: isCritico ? "rgba(239, 68, 68, 0.02)" : "inherit" }}>
                     <td style={{ color: "var(--text-muted)", fontSize: 13 }}>{p.codigo}</td>
                     <td>
-                      <div style={{ fontWeight: 500 }}>{p.nombre}</div>
+                      <div style={{ fontWeight: 600 }}>{p.nombre}</div>
+                      {p.laboratorio && <div style={{ fontSize: 11, color: "var(--accent)", fontWeight: 500 }}>{p.laboratorio}</div>}
                       {sinPrecio && <div style={{ fontSize: 11, color: "var(--danger)", marginTop: 2 }}>Configurar precio</div>}
                     </td>
                     <td style={{ fontWeight: 500 }}>RD${Number(p.precio).toLocaleString()}</td>
                     <td>
                       {isAgotado ? (
                         <span className="badge badge-danger">Agotado</span>
+                      ) : isCritico ? (
+                        <span className="badge badge-danger" style={{ background: "var(--danger)", color: "white" }}>{p.stock_actual} STOCK CRÍTICO</span>
                       ) : isBajo ? (
                         <span className="badge badge-warning">{p.stock_actual} Bajo stock</span>
                       ) : (
                         <span className="badge badge-success">{p.stock_actual} En stock</span>
+                      )}
+                    </td>
+                    <td>
+                      {vencido ? (
+                        <span className="badge badge-danger">Vencido</span>
+                      ) : proximoAVencer ? (
+                        <span className="badge badge-warning" style={{ color: "#9a3412" }}>{diffDias} días</span>
+                      ) : p.fecha_vencimiento ? (
+                        <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{new Date(p.fecha_vencimiento).toLocaleDateString()}</span>
+                      ) : (
+                        <span style={{ fontSize: 12, color: "var(--border)" }}>---</span>
                       )}
                     </td>
                     {isAdmin && (
@@ -402,19 +430,30 @@ export default function InventarioPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="label" style={{ display: "block", marginBottom: 4 }}>Nombre del Producto *</label>
-                <input
-                  className="input"
-                  placeholder="Nombre completo del producto"
-                  value={form.nombre || ""}
-                  onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Nombre del Producto *</label>
+                  <input
+                    className="input"
+                    placeholder="Nombre completo"
+                    value={form.nombre || ""}
+                    onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Laboratorio</label>
+                  <input
+                    className="input"
+                    placeholder="Ej: Bayer, Pfizer..."
+                    value={form.laboratorio || ""}
+                    onChange={(e) => setForm({ ...form, laboratorio: e.target.value })}
+                  />
+                </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1.5fr", gap: 12 }}>
                 <div>
-                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Precio Venta (RD$)</label>
+                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Precio (RD$)</label>
                   <input
                     className="input"
                     type="number"
@@ -436,13 +475,22 @@ export default function InventarioPage() {
                   />
                 </div>
                 <div>
-                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Stock Actual</label>
+                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Stock</label>
                   <input
                     className="input"
                     type="number"
                     min={0}
                     value={form.stock_actual ?? ""}
                     onChange={(e) => setForm({ ...form, stock_actual: e.target.value === "" ? (undefined as any) : parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="label" style={{ display: "block", marginBottom: 4 }}>Vencimiento</label>
+                  <input
+                    className="input"
+                    type="date"
+                    value={form.fecha_vencimiento || ""}
+                    onChange={(e) => setForm({ ...form, fecha_vencimiento: e.target.value })}
                   />
                 </div>
               </div>

@@ -97,7 +97,7 @@ export default function LoginPage() {
         </div>
 
         <p style={{ textAlign: "center", marginTop: 24, fontSize: 12, color: "var(--text-muted)" }}>
-          FarmaSystem Pro © {new Date().getFullYear()} — Todos los derechos reservados
+          FARMACIA ARCHI DOMINICANA © {new Date().getFullYear()} — Todos los derechos reservados
         </p>
       </div>
     </div>
