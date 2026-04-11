@@ -22,7 +22,7 @@ export default function VentasPage() {
   const [ncfTipo, setNcfTipo] = useState<NCFTipo>("B02");
   const [ncfSecuencias, setNcfSecuencias] = useState<NCFSecuencia[]>([]);
   const [metodoPago, setMetodoPago] = useState("efectivo");
-  const [aplicarItbis, setAplicarItbis] = useState(true);
+  const [aplicarItbis, setAplicarItbis] = useState(false);
   const [descuento, setDescuento] = useState(0);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
@@ -89,7 +89,7 @@ export default function VentasPage() {
   function removeItem(id: string) { setCart((prev) => prev.filter((i) => i.id !== id)); }
 
   const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0);
-  const itbisTotal = aplicarItbis ? cart.reduce((s, i) => s + (i.aplica_itbis ? i.itbis * i.precio * i.cantidad : 0), 0) : 0;
+  const itbisTotal = 0;
   const descuentoVal = Math.min(descuento, subtotal + itbisTotal);
   const total = Math.max(0, subtotal + itbisTotal - descuentoVal);
   const ncfActual = ncfSecuencias.find((n) => n.tipo === ncfTipo);
@@ -105,13 +105,13 @@ export default function VentasPage() {
       const totalCosto = cart.reduce((s, i) => s + (i.costo || 0) * i.cantidad, 0);
       const gananciaTotal = subtotal - totalCosto;
 
-      const items = cart.map((i) => ({ producto_id: i.id, cantidad: i.cantidad, precio_unitario: i.precio, costo_unitario: i.costo || 0, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad }));
+      const items = cart.map((i) => ({ producto_id: i.id, cantidad: i.cantidad, precio_unitario: i.precio, costo_unitario: i.costo || 0, itbis_unitario: 0, subtotal: i.precio * i.cantidad }));
       const payload = { ncf_tipo: ncfTipo, cliente_id: clienteId, usuario_id: session?.user?.id, subtotal, itbis_total: itbisTotal, descuento: descuentoVal, total, metodo_pago: metodoPago, estado, costo_total: totalCosto, ganancia: gananciaTotal - descuentoVal, items };
       const res = await fetch("/api/facturas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || "Error al procesar");
 
       const cliente = clientes.find((c) => c.id === clienteId);
-      setFacturaActual({ ncf: data.ncf, ncf_tipo: ncfTipo, fecha: new Date().toISOString(), cliente: { nombre: cliente?.nombre || "", cedula_rnc: cliente?.cedula_rnc }, vendedor: session?.user?.name || "", items: cart.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad, precio_unitario: i.precio, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad })), subtotal, itbis_total: itbisTotal, descuento: descuentoVal, total, metodo_pago: metodoPago, estado });
+      setFacturaActual({ ncf: data.ncf, ncf_tipo: ncfTipo, fecha: new Date().toISOString(), cliente: { nombre: cliente?.nombre || "", cedula_rnc: cliente?.cedula_rnc }, vendedor: session?.user?.name || "", items: cart.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad, precio_unitario: i.precio, itbis_unitario: 0, subtotal: i.precio * i.cantidad })), subtotal, itbis_total: 0, descuento: descuentoVal, total, metodo_pago: metodoPago, estado });
       setCart([]);
       setDescuento(0);
     } catch (err: any) { setError(err.message); } finally { setCargando(false); }
@@ -225,10 +225,6 @@ export default function VentasPage() {
            <div style={{ background: "#ffffff", padding: 20, borderRadius: 12, border: "3px solid var(--primary)", marginTop: 8 }}>
              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>
                 <span>Subtotal</span><span>RD${subtotal.toLocaleString()}</span>
-             </div>
-             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 6, alignItems: "center" }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>ITBIS (18%) <input type="checkbox" checked={aplicarItbis} onChange={(e) => setAplicarItbis(e.target.checked)} /></span>
-                <span>RD${itbisTotal.toLocaleString()}</span>
              </div>
              {/* Descuento global */}
              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--danger)", marginBottom: 10, alignItems: "center", gap: 8 }}>

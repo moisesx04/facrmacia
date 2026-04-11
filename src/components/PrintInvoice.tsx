@@ -89,7 +89,6 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
         {hr()}
         <div style={{ fontSize: 10 }}>
           {row("Subtotal:", `$${data.subtotal.toFixed(2)}`)}
-          {row("ITBIS (18%):", `$${data.itbis_total.toFixed(2)}`)}
           {data.descuento > 0 && row("Descuento:", `-$${data.descuento.toFixed(2)}`)}
         </div>
         {hr()}
@@ -138,7 +137,7 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20, fontSize: 12 }}>
         <thead>
           <tr style={{ background: "#f5f5f5" }}>
-            {["#", "Descripción", "Cant.", "Precio", "ITBIS", "Total"].map((h) => (
+            {["#", "Descripción", "Cant.", "Precio", "Total"].map((h) => (
               <th key={h} style={{ padding: "8px 10px", textAlign: h === "#" || h === "Cant." ? "center" : "left", borderBottom: "2px solid #ccc" }}>{h}</th>
             ))}
           </tr>
@@ -150,7 +149,6 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
               <td style={{ padding: "8px 10px" }}>{item.nombre}</td>
               <td style={{ padding: "8px 10px", textAlign: "center" }}>{item.cantidad}</td>
               <td style={{ padding: "8px 10px" }}>RD${item.precio_unitario.toFixed(2)}</td>
-              <td style={{ padding: "8px 10px" }}>RD${(item.itbis_unitario * item.cantidad).toFixed(2)}</td>
               <td style={{ padding: "8px 10px", fontWeight: 600 }}>RD${item.subtotal.toFixed(2)}</td>
             </tr>
           ))}
@@ -160,7 +158,6 @@ export const PrintInvoice = React.forwardRef<HTMLDivElement, PrintInvoiceProps>(
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <div style={{ width: 280, fontSize: 13 }}>
           {row("Subtotal:", `RD$${data.subtotal.toFixed(2)}`)}
-          {row("ITBIS (18%):", `RD$${data.itbis_total.toFixed(2)}`)}
           {data.descuento > 0 && row("Descuento:", `-RD$${data.descuento.toFixed(2)}`)}
           <div style={{ borderTop: "2px solid #000", marginTop: 8, paddingTop: 8 }}>
             {row("TOTAL:", `RD$${data.total.toFixed(2)}`, true)}

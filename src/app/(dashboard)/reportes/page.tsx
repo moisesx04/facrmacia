@@ -13,7 +13,6 @@ interface Resumen {
   total_cobrado: number;
   cuentas_por_cobrar: number;
   utilidad_bruta: number;
-  total_itbis: number;
   total_descuentos: number;
   por_metodo_pago: Record<string, number>;
 }
@@ -123,15 +122,6 @@ export default function ReportesPage() {
               <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Cuentas X Cobrar (Fiao)</div>
             </div>
 
-            <div className="card" style={{ padding: 24 }}>
-              <div style={{ width: 48, height: 48, background: "#eff6ff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                <Percent size={24} color="#3b82f6" />
-              </div>
-              <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>
-                RD${resumen.total_itbis.toLocaleString()}
-              </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>ITBIS Recaudado</div>
-            </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 450px), 1fr))", gap: 32 }}>
@@ -169,7 +159,7 @@ export default function ReportesPage() {
               <p style={{ color: "var(--text-muted)", lineHeight: 1.6, fontSize: 14 }}>
                 Este reporte comprende el intervalo del **{format(new Date(desde), "dd 'de' MMMM", { locale: es })}** al **{format(new Date(hasta), "dd 'de' MMMM", { locale: es })}**.
                 <br /><br />
-                Durante este tiempo se han procesado **{resumen.total_facturas}** transacciones legítimas. El ITBIS total acumulado por el fisco asciende a **RD${resumen.total_itbis.toLocaleString()}**.
+                Durante este tiempo se han procesado **{resumen.total_facturas}** transacciones legítimas.
               </p>
               {(() => {
                 const d1 = new Date(desde);

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   if (formato === "csv") {
     const rows = [
-      "Fecha,NCF,Tipo,Cliente,RNC,Vendedor,Subtotal,ITBIS,Descuento,Total,Método Pago,Estado",
+      "Fecha,NCF,Tipo,Cliente,RNC,Vendedor,Subtotal,Descuento,Total,Método Pago,Estado",
       ...(data || []).map((f) => {
         const cliente = (f.clientes as unknown) as { nombre: string; cedula_rnc: string } | null;
         const usuario = (f.usuarios as unknown) as { nombre: string } | null;
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
           f.ncf, f.ncf_tipo,
           cliente?.nombre || "", cliente?.cedula_rnc || "",
           usuario?.nombre || "",
-          f.subtotal, f.itbis_total, f.descuento, f.total,
+          f.subtotal, f.descuento, f.total,
           f.metodo_pago, f.estado,
         ].join(",");
       }),
@@ -59,7 +59,6 @@ export async function GET(request: NextRequest) {
     total_cobrado: data?.filter((f) => f.estado === "pagada").reduce((s, f) => s + Number(f.total), 0) || 0,
     cuentas_por_cobrar: data?.filter((f) => f.estado === "pendiente").reduce((s, f) => s + Number(f.total), 0) || 0,
     utilidad_bruta: data?.filter((f) => f.estado === "pagada").reduce((s, f: any) => s + Number(f.ganancia || 0), 0) || 0,
-    total_itbis: data?.reduce((s, f) => s + Number(f.itbis_total), 0) || 0,
     total_descuentos: data?.reduce((s, f) => s + Number(f.descuento), 0) || 0,
     por_metodo_pago: data?.reduce((acc, f) => {
       acc[f.metodo_pago] = (acc[f.metodo_pago] || 0) + Number(f.total);

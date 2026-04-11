@@ -89,10 +89,10 @@ export default function FacturasPage() {
         nombre: i.productos?.nombre || "",
         cantidad: i.cantidad,
         precio_unitario: i.precio_unitario,
-        itbis_unitario: i.itbis_unitario,
+        itbis_unitario: 0,
         subtotal: i.subtotal,
       })) || [],
-      subtotal: f.subtotal, itbis_total: f.itbis_total, descuento: f.descuento,
+      subtotal: f.subtotal, itbis_total: 0, descuento: f.descuento,
       total: f.total, metodo_pago: f.metodo_pago, estado: f.estado,
     };
   }

@@ -26,8 +26,8 @@ const EMPTY: Partial<Producto> = {
   fecha_vencimiento: "",
   precio: 0,
   costo: 0,
-  itbis: 0.18,
-  aplica_itbis: true,
+  itbis: 0,
+  aplica_itbis: false,
   stock_actual: 0,
   stock_minimo: 2,
 };
@@ -89,7 +89,8 @@ export default function InventarioPage() {
       // Convertir tipos numéricos
       body.precio = Number(body.precio) || 0;
       body.costo = Number(body.costo) || 0;
-      body.itbis = Number(body.itbis) || 0.18;
+      body.itbis = 0;
+      body.aplica_itbis = false;
       body.stock_actual = Number(body.stock_actual) || 0;
       body.stock_minimo = Number(body.stock_minimo) || 5;
 
@@ -205,8 +206,8 @@ export default function InventarioPage() {
             nombre: row.nombre || "",
             precio: parseFloat(row.precio || "0") || 0,
             costo: parseFloat(row.costo || "0") || 0,
-            itbis: parseFloat(row.itbis || "0.18") || 0.18,
-            aplica_itbis: row.aplica_itbis !== undefined ? (row.aplica_itbis.toString().toLowerCase() !== "false") : true,
+            itbis: 0,
+            aplica_itbis: false,
             stock_actual: parseInt(row.stock_actual || "0") || 0,
             stock_minimo: parseInt(row.stock_minimo || "2") || 2,
             activo: true,
@@ -498,18 +499,6 @@ export default function InventarioPage() {
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0" }}>
-                <input
-                  type="checkbox"
-                  id="aplica_itbis"
-                  checked={form.aplica_itbis ?? true}
-                  onChange={(e) => setForm({ ...form, aplica_itbis: e.target.checked })}
-                  style={{ width: 16, height: 16, cursor: "pointer" }}
-                />
-                <label htmlFor="aplica_itbis" style={{ cursor: "pointer", fontSize: 14 }}>
-                  Aplica ITBIS (18%)
-                </label>
-              </div>
 
               {saveError && (
                 <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid var(--danger)", borderRadius: 8, padding: "10px 14px", color: "var(--danger)", fontSize: 13 }}>
