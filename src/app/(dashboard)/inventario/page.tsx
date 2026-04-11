@@ -266,16 +266,16 @@ export default function InventarioPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 32 }}>
         <div>
           <h1 className="page-title">Inventario</h1>
-          <p className="page-subtitle">Gestión de catálogo y existencias</p>
+          <p className="page-subtitle">Gestión de catálogo y existencias en tiempo real</p>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
           {isAdmin && (
             <>
               <button className="btn btn-outline" onClick={() => { setImportError(""); setImportSuccess(""); setImportFile(null); setImportPreview([]); setModal("importar"); }}>
-                <Upload size={16} /> Importar Datos
+                <Upload size={20} /> Importar Datos
               </button>
               <button className="btn btn-primary" onClick={() => { setForm(EMPTY); setSaveError(""); setModal("crear"); }}>
-                <Plus size={16} /> Agregar Producto
+                <Plus size={22} /> Agregar Producto
               </button>
             </>
           )}
@@ -284,19 +284,25 @@ export default function InventarioPage() {
 
       {/* Stats */}
       <div className="inventory-stats">
-        <div className="card" style={{ padding: 20 }}>
+        <div className="card" style={{ padding: 28 }}>
           <div className="label">Total de Productos</div>
-          <div style={{ fontSize: 24, fontWeight: 600 }}>{totalCount}</div>
+          <div style={{ fontSize: 40, fontWeight: 900 }}>{totalCount}</div>
         </div>
-        <div className="card" style={{ padding: 20, borderColor: bajoStock.length > 0 ? "var(--danger)" : "var(--border)" }}>
-          <div className="label">Stock Crítico</div>
-          <div style={{ fontSize: 24, fontWeight: 600, color: bajoStock.length > 0 ? "var(--danger)" : "inherit" }}>{bajoStock.length}</div>
+        <div className="card" style={{ padding: 28, borderColor: bajoStock.length > 0 ? "var(--danger)" : "var(--border)", background: bajoStock.length > 0 ? "#fef2f2" : "var(--bg-card)" }}>
+          <div className="label" style={{ color: bajoStock.length > 0 ? "#991b1b" : "inherit" }}>Bajo Stock / Agotado</div>
+          <div style={{ fontSize: 40, fontWeight: 900, color: bajoStock.length > 0 ? "#dc2626" : "inherit" }}>{bajoStock.length}</div>
         </div>
-        <div className="card" style={{ padding: 20 }}>
-          <div className="label">Búsqueda Rápida</div>
-          <div style={{ position: "relative", marginTop: 8 }}>
-            <Search size={16} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-            <input className="input" placeholder="Referencia, nombre, etc..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ paddingLeft: 32 }} />
+        <div className="card" style={{ padding: 24 }}>
+          <div className="label" style={{ marginBottom: 12 }}>Búsqueda Rápida</div>
+          <div style={{ position: "relative" }}>
+            <Search size={20} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+            <input 
+              className="input" 
+              placeholder="Referencia, nombre, etc..." 
+              value={busqueda} 
+              onChange={(e) => setBusqueda(e.target.value)} 
+              style={{ paddingLeft: 52 }} 
+            />
           </div>
         </div>
       </div>

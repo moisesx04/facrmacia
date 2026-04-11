@@ -48,43 +48,44 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
 
       {/* Sidebar Container */}
       <aside className={`sidebar ${isOpen ? "open" : ""}`} style={{ 
-        width: 260, 
+        width: 280, /* Increased width slightly */
         height: '100vh',
         background: "#ffffff",
-        borderRight: "1px solid #e2e8f0",
+        borderRight: "2px solid var(--border)", /* Thicker border */
         display: 'flex',
         flexDirection: 'column',
       }}>
         {/* Header / Logo */}
-        <div style={{ padding: "32px 24px", display: "flex", alignItems: "center", gap: 12, borderBottom: "1px solid #e2e8f0" }}>
+        <div style={{ padding: "40px 24px", display: "flex", alignItems: "center", gap: 14, borderBottom: "2px solid var(--border)" }}>
           <div style={{ 
-            width: 36, height: 36, background: "#0f172a", 
-            borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center"
+            width: 44, height: 44, background: "var(--primary)", 
+            borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center"
           }}>
-            <Pill size={20} color="#ffffff" />
+            <Pill size={24} color="#ffffff" />
           </div>
           <div>
-            <h1 style={{ color: "#0f172a", fontSize: 13, fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>FARMACIA ARCHI DOMINICANA</h1>
-            <p style={{ color: "#64748b", fontSize: 10, fontWeight: 500, margin: 0 }}>SOFTWARE DE GESTIÓN</p>
+            <h1 style={{ color: "black", fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em", margin: 0, lineHeight: 1.1 }}>FARMACIA ARCHI DOMINICANA</h1>
+            <p style={{ color: "var(--primary)", fontSize: 11, fontWeight: 700, margin: "2px 0 0 0" }}>GESTIÓN PROFESIONAL</p>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav style={{ flex: 1, padding: "24px 16px", display: "flex", flexDirection: "column", gap: 4, overflowY: 'auto' }}>
+        <nav style={{ flex: 1, padding: "32px 16px", display: "flex", flexDirection: "column", gap: 8, overflowY: 'auto' }}>
           {filtered.map((item) => {
             const active = pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
 
             return (
               <Link key={item.href} href={item.href} style={{
-                display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
-                textDecoration: "none", borderRadius: 8, transition: "all 0.2s ease",
-                background: active ? "#f1f5f9" : "transparent",
-                color: active ? "#0f172a" : "#64748b"
+                display: "flex", alignItems: "center", gap: 14, padding: "14px 18px",
+                textDecoration: "none", borderRadius: 10, transition: "all 0.2s ease",
+                background: active ? "#eff6ff" : "transparent",
+                border: active ? "2px solid var(--primary)" : "2px solid transparent",
+                color: active ? "var(--primary)" : "#334155"
               }}>
-                 <Icon size={18} style={{ color: active ? "#000000" : "#94a3b8" }} />
+                 <Icon size={22} style={{ color: active ? "var(--primary)" : "#64748b" }} />
                 <span style={{ 
-                  fontSize: 14, fontWeight: active ? 600 : 500, 
+                  fontSize: 16, fontWeight: active ? 800 : 600, 
                 }}>{item.label}</span>
               </Link>
             );
@@ -92,21 +93,21 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
         </nav>
 
         {/* User / Footer */}
-        <div style={{ padding: "20px 16px", borderTop: "1px solid #e2e8f0" }}>
+        <div style={{ padding: "24px 16px", borderTop: "2px solid var(--border)" }}>
           <div style={{ 
-            display: "flex", alignItems: "center", gap: 12, padding: "12px", 
-            background: "#f8fafc", borderRadius: 8, marginBottom: 12, border: "1px solid #f1f5f9"
+            display: "flex", alignItems: "center", gap: 14, padding: "16px", 
+            background: "#f8fafc", borderRadius: 12, marginBottom: 16, border: "2px solid #e2e8f0"
           }}>
             <div style={{ 
-              width: 32, height: 32, background: "#e2e8f0", 
-              color: "#334155", borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center", 
-              fontSize: 14, fontWeight: 600
+              width: 40, height: 40, background: "var(--primary)", 
+              color: "white", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", 
+              fontSize: 18, fontWeight: 800
             }}>
               {userName?.charAt(0).toUpperCase()}
             </div>
             <div style={{ overflow: "hidden" }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
-              <div style={{ fontSize: 11, fontWeight: 500, color: "#64748b" }}>{role === "admin" ? "Administrador" : "Operador"}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "black", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{userName}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--primary)" }}>{role === "admin" ? "ADMINISTRADOR" : "VENDEDOR"}</div>
             </div>
           </div>
           <button onClick={() => signOut()} style={{ 

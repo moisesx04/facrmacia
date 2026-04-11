@@ -131,10 +131,16 @@ export default function VentasPage() {
           <div style={{ display: "flex", gap: 12 }}>
             <div style={{ position: "relative", flex: 1 }}>
               <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-              <input className="input" placeholder="Buscar por código de barras o nombre..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ paddingLeft: 44, padding: "16px 16px 16px 44px", fontSize: 16, background: "white", borderRadius: 8, boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }} />
+              <input 
+                className="input" 
+                placeholder="Buscar medicamento..." 
+                value={busqueda} 
+                onChange={(e) => setBusqueda(e.target.value)} 
+                style={{ paddingLeft: 56 }} 
+              />
             </div>
-            <button className="btn btn-outline hover-lift" onClick={() => setModalManual(true)} style={{ height: 56, background: "white", fontWeight: 700, padding: "0 24px" }}>
-              <Plus size={16} /> Artículo Manual
+            <button className="btn btn-primary hover-lift" onClick={() => setModalManual(true)} style={{ height: 60, padding: "0 32px", fontSize: 18 }}>
+              <Plus size={24} /> Artículo Manual
             </button>
           </div>
 
@@ -165,9 +171,9 @@ export default function VentasPage() {
 
         <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20, position: "sticky", top: 24 }}>
            <div>
-             <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text-main)", marginBottom: 16, display: "flex", justifyContent: "space-between" }}>
-                <span>Nuevo Recibo</span>
-                <span className="badge badge-neutral">{cart.length}</span>
+             <h3 style={{ fontSize: 22, fontWeight: 900, color: "black", marginBottom: 20, display: "flex", justifyContent: "space-between", letterSpacing: "-0.03em" }}>
+                <span>Nuevo Ticket</span>
+                <span className="badge badge-neutral" style={{ padding: "4px 12px", fontSize: 16 }}>{cart.length}</span>
              </h3>
            </div>
 
@@ -215,7 +221,7 @@ export default function VentasPage() {
              })}
            </div>
 
-           <div style={{ background: "#f8fafc", padding: 14, borderRadius: 8, border: "1px solid var(--border)" }}>
+           <div style={{ background: "#ffffff", padding: 20, borderRadius: 12, border: "3px solid var(--primary)", marginTop: 8 }}>
              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>
                 <span>Subtotal</span><span>RD${subtotal.toLocaleString()}</span>
              </div>
