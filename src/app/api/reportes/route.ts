@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await db
     .from("facturas")
-    .select(`id, ncf, ncf_tipo, subtotal, itbis_total, descuento, total, metodo_pago, estado, created_at,
+    .select(`id, ncf, ncf_tipo, subtotal, itbis_total, descuento, total, metodo_pago, estado, created_at, ganancia,
       clientes(nombre, cedula_rnc),
       usuarios!usuario_id(nombre),
       factura_items(cantidad, precio_unitario, subtotal, productos(nombre, codigo))`)
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     total_ventas: data?.reduce((s, f) => s + Number(f.total), 0) || 0,
     total_cobrado: data?.filter((f) => f.estado === "pagada").reduce((s, f) => s + Number(f.total), 0) || 0,
     cuentas_por_cobrar: data?.filter((f) => f.estado === "pendiente").reduce((s, f) => s + Number(f.total), 0) || 0,
-    utilidad_bruta: data?.filter((f) => f.estado === "pagada").reduce((s, f) => s + Number(f.ganancia || 0), 0) || 0,
+    utilidad_bruta: data?.filter((f) => f.estado === "pagada").reduce((s, f: any) => s + Number(f.ganancia || 0), 0) || 0,
     total_itbis: data?.reduce((s, f) => s + Number(f.itbis_total), 0) || 0,
     total_descuentos: data?.reduce((s, f) => s + Number(f.descuento), 0) || 0,
     por_metodo_pago: data?.reduce((acc, f) => {

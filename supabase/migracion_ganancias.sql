@@ -7,7 +7,7 @@ ALTER TABLE facturas ADD COLUMN IF NOT EXISTS costo_total DECIMAL(10, 2) DEFAULT
 ALTER TABLE facturas ADD COLUMN IF NOT EXISTS ganancia DECIMAL(10, 2) DEFAULT 0;
 
 -- 2. Eliminamos la función vieja para poder cambiar los parámetros de entrada sin error
-DROP FUNCTION IF EXISTS create_invoice_process;
+DROP FUNCTION IF EXISTS create_invoice_process(TEXT, UUID, UUID, DECIMAL, DECIMAL, DECIMAL, DECIMAL, TEXT, TEXT, TEXT, JSONB);
 
 CREATE OR REPLACE FUNCTION create_invoice_process(
   p_ncf_tipo TEXT,
