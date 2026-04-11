@@ -29,7 +29,7 @@ const EMPTY: Partial<Producto> = {
   itbis: 0.18,
   aplica_itbis: true,
   stock_actual: 0,
-  stock_minimo: 5,
+  stock_minimo: 2,
 };
 
 export default function InventarioPage() {
@@ -208,7 +208,7 @@ export default function InventarioPage() {
             itbis: parseFloat(row.itbis || "0.18") || 0.18,
             aplica_itbis: row.aplica_itbis !== undefined ? (row.aplica_itbis.toString().toLowerCase() !== "false") : true,
             stock_actual: parseInt(row.stock_actual || "0") || 0,
-            stock_minimo: parseInt(row.stock_minimo || "5") || 5,
+            stock_minimo: parseInt(row.stock_minimo || "2") || 2,
             activo: true,
           };
         }).filter((p: any) => p.nombre.length > 0);
