@@ -151,7 +151,7 @@ export default function VentasPage() {
                       </td>
                       <td style={{ fontWeight: 500 }}>RD${p.precio.toLocaleString()}</td>
                       <td>
-                        <span className={`badge ${p.stock_actual <= 20 ? 'badge-danger' : 'badge-neutral'}`}>
+                        <span className={`badge ${p.stock_actual <= p.stock_minimo ? 'badge-danger' : 'badge-neutral'}`}>
                            {p.stock_actual > 0 ? p.stock_actual : "Agotado"}
                         </span>
                       </td>

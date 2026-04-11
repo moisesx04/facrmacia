@@ -324,8 +324,7 @@ export default function InventarioPage() {
                 </tr>
               )) : productos.map((p) => {
                 const isAgotado = p.stock_actual === 0;
-                const isCritico = p.stock_actual > 0 && p.stock_actual <= 20; // Alerta <= 20
-                const isBajo = p.stock_actual > 20 && p.stock_actual <= p.stock_minimo;
+                const isBajo = p.stock_actual > 0 && p.stock_actual <= p.stock_minimo;
                 const sinPrecio = Number(p.precio) <= 0;
                 
                 // Lógica de vencimiento
@@ -336,7 +335,7 @@ export default function InventarioPage() {
                 const vencido = diffDias !== null && diffDias <= 0;
 
                 return (
-                  <tr key={p.id} style={{ background: isCritico ? "rgba(239, 68, 68, 0.02)" : "inherit" }}>
+                  <tr key={p.id}>
                     <td style={{ color: "var(--text-muted)", fontSize: 13 }}>{p.codigo}</td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{p.nombre}</div>
@@ -347,8 +346,6 @@ export default function InventarioPage() {
                     <td>
                       {isAgotado ? (
                         <span className="badge badge-danger">Agotado</span>
-                      ) : isCritico ? (
-                        <span className="badge badge-danger" style={{ background: "var(--danger)", color: "white" }}>{p.stock_actual} STOCK CRÍTICO</span>
                       ) : isBajo ? (
                         <span className="badge badge-warning">{p.stock_actual} Bajo stock</span>
                       ) : (
