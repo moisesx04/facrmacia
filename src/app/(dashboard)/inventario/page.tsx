@@ -229,14 +229,15 @@ export default function InventarioPage() {
 
   // ---- Modal overlay style ----
   const overlayStyle: React.CSSProperties = {
-    position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)",
+    position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
     display: "flex", alignItems: "center", justifyContent: "center",
     zIndex: 1000, padding: 16,
   };
   const modalBoxStyle: React.CSSProperties = {
-    background: "var(--card)", border: "1px solid var(--border)",
+    background: "#ffffff", border: "1px solid var(--border)",
     borderRadius: 12, padding: 28, width: "100%", maxWidth: 520,
     maxHeight: "90vh", overflowY: "auto",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
   };
 
   return (

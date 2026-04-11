@@ -234,7 +234,7 @@ export default function VentasPage() {
 
       {facturaActual && (
         <div className="modal-overlay">
-          <div className="card" style={{ maxWidth: 380, width: "100%", textAlign: "center", padding: 32 }}>
+          <div style={{ background: "#ffffff", borderRadius: 12, maxWidth: 380, width: "100%", textAlign: "center", padding: 32, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div style={{ width: 48, height: 48, background: "#dcfce7", color: "#16a34a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}><Check size={24} /></div>
             <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>Transacción Aprobada</h2>
             <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 24 }}>NCF Asignado: {facturaActual.ncf}</p>
@@ -249,7 +249,7 @@ export default function VentasPage() {
 
       {modalManual && (
         <div className="modal-overlay">
-          <div className="card" style={{ maxWidth: 400, width: "100%", padding: 32 }}>
+          <div style={{ background: "#ffffff", borderRadius: 12, maxWidth: 400, width: "100%", padding: 32, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, letterSpacing: "-0.02em" }}>Agregar Artículo Libre</h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                <div>

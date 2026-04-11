@@ -47,9 +47,9 @@ body { background: var(--bg-app); color: var(--text-main); min-height: 100vh; -w
 .label { display: block; font-size: 12px; font-weight: 500; color: var(--text-main); margin-bottom: 6px; }
 
 /* Modal Simple */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fade 0.15s ease-out; }
-.modal-content { background: white; border-radius: 8px; width: 100%; max-width: 450px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-@keyframes fade { from{opacity:0;} to{opacity:1;} }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 999; animation: fade 0.15s ease-out; padding: 16px; }
+.modal-content { background: #ffffff; border-radius: 12px; width: 100%; max-width: 450px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+@keyframes fade { from{opacity:0;transform:scale(0.97);} to{opacity:1;transform:scale(1);} }
 
 /* Layout Core Structure (Restored) */
 .dashboard-layout {
