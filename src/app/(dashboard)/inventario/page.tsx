@@ -139,10 +139,13 @@ export default function InventarioPage() {
   function parseFileContent(text: string, fileName: string) {
     const isTxt = fileName.toLowerCase().endsWith(".txt");
     if (isTxt) {
-      return text.split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .map(nombre => ({ nombre }));
+      // De-duplicar nombres para evitar subir lo mismo varias veces
+      const uniqueNames = Array.from(new Set(
+        text.split("\n")
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+      ));
+      return uniqueNames.map(nombre => ({ nombre }));
     }
 
     const lines = text.trim().split("\n");
