@@ -7,7 +7,7 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, Check, CreditCard }
 import { PrintInvoice, type InvoiceData } from "@/components/PrintInvoice";
 import { NCF_LABELS, type NCFTipo } from "@/lib/ncf";
 
-interface Producto { id: string; codigo: string; nombre: string; precio: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
+interface Producto { id: string; codigo: string; nombre: string; precio: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
 interface CartItem extends Producto { cantidad: number }
 interface Cliente { id: string; nombre: string; cedula_rnc?: string }
 interface NCFSecuencia { id: string; tipo: NCFTipo; prefix: string; secuencia_actual: number; secuencia_fin: number }
@@ -67,6 +67,7 @@ export default function VentasPage() {
        codigo: "MANUAL",
        nombre: manualItem.nombre,
        precio: Number(manualItem.precio),
+       costo: Number(manualItem.precio), // default to 0 profit for manual items unless specified
        itbis: 0.18,
        aplica_itbis: aplicarItbis,
        stock_actual: 9999
@@ -92,8 +93,12 @@ export default function VentasPage() {
     setCargando(true); setError("");
 
     try {
-      const items = cart.map((i) => ({ producto_id: i.id, cantidad: i.cantidad, precio_unitario: i.precio, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad }));
-      const res = await fetch("/api/facturas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ncf_tipo: ncfTipo, cliente_id: clienteId, usuario_id: session?.user?.id, subtotal, itbis_total: itbisTotal, descuento: 0, total, metodo_pago: metodoPago, estado, items }) });
+      const totalCosto = cart.reduce((s, i) => s + (i.costo || 0) * i.cantidad, 0);
+      const gananciaTotal = subtotal - totalCosto;
+
+      const items = cart.map((i) => ({ producto_id: i.id, cantidad: i.cantidad, precio_unitario: i.precio, costo_unitario: i.costo || 0, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad }));
+      const payload = { ncf_tipo: ncfTipo, cliente_id: clienteId, usuario_id: session?.user?.id, subtotal, itbis_total: itbisTotal, descuento: 0, total, metodo_pago: metodoPago, estado, costo_total: totalCosto, ganancia: gananciaTotal, items };
+      const res = await fetch("/api/facturas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || "Error al procesar");
 
       const cliente = clientes.find((c) => c.id === clienteId);

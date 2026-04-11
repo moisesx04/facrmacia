@@ -46,6 +46,8 @@ export async function POST(request: NextRequest) {
     p_metodo_pago: body.metodo_pago,
     p_estado: body.estado || "pagada",
     p_notas: body.notas || "",
+    p_costo_total: body.costo_total || 0,
+    p_ganancia: body.ganancia || 0,
     p_items: body.items,
   });
 

@@ -12,6 +12,7 @@ interface Resumen {
   total_ventas: number;
   total_cobrado: number;
   cuentas_por_cobrar: number;
+  utilidad_bruta: number;
   total_itbis: number;
   total_descuentos: number;
   por_metodo_pago: Record<string, number>;
@@ -92,6 +93,16 @@ export default function ReportesPage() {
                 RD${resumen.total_cobrado?.toLocaleString() || "0"}
               </div>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Ingreso Real (Cobrado)</div>
+            </div>
+
+            <div className="card" style={{ padding: 24 }}>
+              <div style={{ width: 48, height: 48, background: "#f0f9ff", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                <TrendingUp size={24} color="#0ea5e9" />
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>
+                RD${resumen.utilidad_bruta?.toLocaleString() || "0"}
+              </div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Utilidad Bruta (Ganancia)</div>
             </div>
 
             <div className="card" style={{ padding: 24 }}>
