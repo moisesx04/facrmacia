@@ -7,8 +7,8 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, Check, CreditCard }
 import { PrintInvoice, type InvoiceData } from "@/components/PrintInvoice";
 import { NCF_LABELS, type NCFTipo } from "@/lib/ncf";
 
-interface Producto { id: string; codigo: string; nombre: string; precio: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
-interface CartItem extends Producto { cantidad: number }
+interface Producto { id: string; codigo: string; nombre: string; precio: number; precioOriginal?: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
+interface CartItem extends Producto { cantidad: number; precioOriginal: number; }
 interface Cliente { id: string; nombre: string; cedula_rnc?: string }
 interface NCFSecuencia { id: string; tipo: NCFTipo; prefix: string; secuencia_actual: number; secuencia_fin: number }
 
@@ -23,6 +23,7 @@ export default function VentasPage() {
   const [ncfSecuencias, setNcfSecuencias] = useState<NCFSecuencia[]>([]);
   const [metodoPago, setMetodoPago] = useState("efectivo");
   const [aplicarItbis, setAplicarItbis] = useState(true);
+  const [descuento, setDescuento] = useState(0);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [facturaActual, setFacturaActual] = useState<InvoiceData | null>(null);
@@ -56,18 +57,24 @@ export default function VentasPage() {
     setCart((prev) => {
       const existe = prev.find((i) => i.id === p.id);
       if (existe) return existe.cantidad >= p.stock_actual ? prev : prev.map((i) => i.id === p.id ? { ...i, cantidad: i.cantidad + 1 } : i);
-      return [...prev, { ...p, cantidad: 1 }];
+      return [...prev, { ...p, cantidad: 1, precioOriginal: p.precio }];
     });
+  }
+
+  function cambiarPrecio(id: string, nuevoPrecio: number) {
+    setCart((prev) => prev.map((i) => i.id === id ? { ...i, precio: Math.max(0, nuevoPrecio) } : i));
   }
 
   function agregarProductoManual() {
     if (!manualItem.nombre || Number(manualItem.precio) <= 0) return;
+    const p = Number(manualItem.precio);
     const itemManual: Producto = {
        id: "manual-" + Date.now(),
        codigo: "MANUAL",
        nombre: manualItem.nombre,
-       precio: Number(manualItem.precio),
-       costo: Number(manualItem.precio), // default to 0 profit for manual items unless specified
+       precio: p,
+       precioOriginal: p,
+       costo: 0,
        itbis: 0.18,
        aplica_itbis: aplicarItbis,
        stock_actual: 9999
@@ -82,7 +89,8 @@ export default function VentasPage() {
 
   const subtotal = cart.reduce((s, i) => s + i.precio * i.cantidad, 0);
   const itbisTotal = aplicarItbis ? cart.reduce((s, i) => s + (i.aplica_itbis ? i.itbis * i.precio * i.cantidad : 0), 0) : 0;
-  const total = subtotal + itbisTotal;
+  const descuentoVal = Math.min(descuento, subtotal + itbisTotal);
+  const total = Math.max(0, subtotal + itbisTotal - descuentoVal);
   const ncfActual = ncfSecuencias.find((n) => n.tipo === ncfTipo);
   const ncfAgotado = ncfActual && ncfActual.secuencia_actual > ncfActual.secuencia_fin;
 
@@ -97,13 +105,14 @@ export default function VentasPage() {
       const gananciaTotal = subtotal - totalCosto;
 
       const items = cart.map((i) => ({ producto_id: i.id, cantidad: i.cantidad, precio_unitario: i.precio, costo_unitario: i.costo || 0, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad }));
-      const payload = { ncf_tipo: ncfTipo, cliente_id: clienteId, usuario_id: session?.user?.id, subtotal, itbis_total: itbisTotal, descuento: 0, total, metodo_pago: metodoPago, estado, costo_total: totalCosto, ganancia: gananciaTotal, items };
+      const payload = { ncf_tipo: ncfTipo, cliente_id: clienteId, usuario_id: session?.user?.id, subtotal, itbis_total: itbisTotal, descuento: descuentoVal, total, metodo_pago: metodoPago, estado, costo_total: totalCosto, ganancia: gananciaTotal - descuentoVal, items };
       const res = await fetch("/api/facturas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const data = await res.json(); if (!res.ok) throw new Error(data.error || "Error al procesar");
 
       const cliente = clientes.find((c) => c.id === clienteId);
-      setFacturaActual({ ncf: data.ncf, ncf_tipo: ncfTipo, fecha: new Date().toISOString(), cliente: { nombre: cliente?.nombre || "", cedula_rnc: cliente?.cedula_rnc }, vendedor: session?.user?.name || "", items: cart.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad, precio_unitario: i.precio, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad })), subtotal, itbis_total: itbisTotal, descuento: 0, total, metodo_pago: metodoPago, estado });
+      setFacturaActual({ ncf: data.ncf, ncf_tipo: ncfTipo, fecha: new Date().toISOString(), cliente: { nombre: cliente?.nombre || "", cedula_rnc: cliente?.cedula_rnc }, vendedor: session?.user?.name || "", items: cart.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad, precio_unitario: i.precio, itbis_unitario: aplicarItbis && i.aplica_itbis ? i.itbis * i.precio : 0, subtotal: i.precio * i.cantidad })), subtotal, itbis_total: itbisTotal, descuento: descuentoVal, total, metodo_pago: metodoPago, estado });
       setCart([]);
+      setDescuento(0);
     } catch (err: any) { setError(err.message); } finally { setCargando(false); }
   }
 
@@ -159,35 +168,68 @@ export default function VentasPage() {
              </h3>
            </div>
 
-           <div style={{ maxHeight: 250, overflowY: "auto", display: "flex", flexDirection: "column", gap: 12 }}>
+           <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
              {cart.length === 0 ? (
                 <div style={{ padding: "40px 0", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>Añada medicamentos al recibo para continuar.</div>
-             ) : cart.map((item) => (
-                <div key={item.id} style={{ display: "flex", alignItems: "flex-start", gap: 12, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
-                  <div style={{ flex: 1 }}>
-                     <div style={{ fontSize: 13, fontWeight: 500 }}>{item.nombre}</div>
-                     <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>RD${item.precio.toLocaleString()} x {item.cantidad}</div>
+             ) : cart.map((item) => {
+               const rebajado = item.precio < item.precioOriginal;
+               return (
+                <div key={item.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
+                  {/* Fila 1: Nombre + eliminar */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, flex: 1, marginRight: 8 }}>{item.nombre}</div>
+                    <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="btn btn-ghost" style={{ padding: 4, color: "var(--danger)", flexShrink: 0 }}><Trash2 size={13}/></button>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                     <button onClick={(e) => { e.stopPropagation(); cambiarCantidad(item.id, -1); }} className="btn btn-ghost" style={{ padding: 4 }}><Minus size={14}/></button>
-                     <span style={{ fontSize: 13, fontWeight: 500 }}>{item.cantidad}</span>
-                     <button onClick={(e) => { e.stopPropagation(); cambiarCantidad(item.id, 1); }} className="btn btn-ghost" style={{ padding: 4 }}><Plus size={14}/></button>
-                     <button onClick={(e) => { e.stopPropagation(); removeItem(item.id); }} className="btn btn-ghost" style={{ padding: 4, color: "var(--danger)" }}><Trash2 size={14}/></button>
+                  {/* Fila 2: precio editable + cantidad + subtotal */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ position: "relative", width: 90 }}>
+                      <span style={{ position: "absolute", left: 7, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--text-muted)" }}>RD$</span>
+                      <input
+                        type="number" min="0" step="any"
+                        value={item.precio}
+                        onChange={(e) => cambiarPrecio(item.id, parseFloat(e.target.value) || 0)}
+                        style={{ width: "100%", padding: "4px 4px 4px 28px", fontSize: 12, border: `1px solid ${rebajado ? "var(--danger)" : "var(--border)"}`, borderRadius: 5, outline: "none", background: rebajado ? "#fff5f5" : "white" }}
+                      />
+                    </div>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)" }}>×</span>
+                    <button onClick={(e) => { e.stopPropagation(); cambiarCantidad(item.id, -1); }} className="btn btn-ghost" style={{ padding: "2px 5px", fontSize: 12 }}><Minus size={12}/></button>
+                    <span style={{ fontSize: 13, fontWeight: 600, minWidth: 20, textAlign: "center" }}>{item.cantidad}</span>
+                    <button onClick={(e) => { e.stopPropagation(); cambiarCantidad(item.id, 1); }} className="btn btn-ghost" style={{ padding: "2px 5px", fontSize: 12 }}><Plus size={12}/></button>
+                    <span style={{ fontSize: 12, fontWeight: 500, marginLeft: "auto", color: rebajado ? "var(--danger)" : "var(--text-main)" }}>
+                      RD${(item.precio * item.cantidad).toLocaleString()}
+                    </span>
                   </div>
+                  {rebajado && (
+                    <div style={{ fontSize: 10, color: "var(--danger)", marginTop: 2 }}>
+                      Precio original: RD${item.precioOriginal.toLocaleString()} · Rebaja: RD${((item.precioOriginal - item.precio) * item.cantidad).toLocaleString()}
+                    </div>
+                  )}
                 </div>
-             ))}
+               );
+             })}
            </div>
 
-           <div style={{ background: "#f8fafc", padding: 16, borderRadius: 8, border: "1px solid var(--border)" }}>
-             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 8 }}>
+           <div style={{ background: "#f8fafc", padding: 14, borderRadius: 8, border: "1px solid var(--border)" }}>
+             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>
                 <span>Subtotal</span><span>RD${subtotal.toLocaleString()}</span>
              </div>
-             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 12, alignItems: "center" }}>
+             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 6, alignItems: "center" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 8 }}>ITBIS (18%) <input type="checkbox" checked={aplicarItbis} onChange={(e) => setAplicarItbis(e.target.checked)} /></span>
                 <span>RD${itbisTotal.toLocaleString()}</span>
              </div>
-             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 600, color: "var(--text-main)", borderTop: "1px solid #e2e8f0", paddingTop: 12 }}>
-                <span>Cobrar</span><span>RD${total.toLocaleString()}</span>
+             {/* Descuento global */}
+             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--danger)", marginBottom: 10, alignItems: "center", gap: 8 }}>
+               <span style={{ flexShrink: 0 }}>Descuento (RD$)</span>
+               <input
+                 type="number" min="0" step="any"
+                 value={descuento || ""}
+                 placeholder="0"
+                 onChange={(e) => setDescuento(parseFloat(e.target.value) || 0)}
+                 style={{ width: 90, padding: "4px 8px", fontSize: 13, border: "1px solid var(--danger)", borderRadius: 5, outline: "none", textAlign: "right", color: "var(--danger)", background: descuentoVal > 0 ? "#fff5f5" : "white" }}
+               />
+             </div>
+             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 18, fontWeight: 700, color: "var(--text-main)", borderTop: "1px solid #e2e8f0", paddingTop: 10 }}>
+                <span>Total</span><span>RD${total.toLocaleString()}</span>
              </div>
            </div>
 
