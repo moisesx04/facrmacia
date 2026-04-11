@@ -7,7 +7,7 @@ import { Search, Plus, Minus, Trash2, ShoppingCart, Printer, Check, CreditCard }
 import { PrintInvoice, type InvoiceData } from "@/components/PrintInvoice";
 import { NCF_LABELS, type NCFTipo } from "@/lib/ncf";
 
-interface Producto { id: string; codigo: string; nombre: string; laboratorio?: string; precio: number; precioOriginal?: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; }
+interface Producto { id: string; codigo: string; nombre: string; laboratorio?: string; precio: number; precioOriginal?: number; costo?: number; itbis: number; aplica_itbis: boolean; stock_actual: number; stock_minimo: number; }
 interface CartItem extends Producto { cantidad: number; precioOriginal: number; }
 interface Cliente { id: string; nombre: string; cedula_rnc?: string }
 interface NCFSecuencia { id: string; tipo: NCFTipo; prefix: string; secuencia_actual: number; secuencia_fin: number }
@@ -77,7 +77,8 @@ export default function VentasPage() {
        costo: 0,
        itbis: 0.18,
        aplica_itbis: aplicarItbis,
-       stock_actual: 9999
+       stock_actual: 9999,
+       stock_minimo: 0
     };
     agregarProducto(itemManual);
     setModalManual(false);
