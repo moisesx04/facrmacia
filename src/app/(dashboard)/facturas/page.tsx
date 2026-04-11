@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { Search, Printer, XCircle, ChevronDown, X } from "lucide-react";
+import { Search, Printer, XCircle, ChevronDown, X, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useReactToPrint } from "react-to-print";
@@ -28,6 +28,9 @@ export default function FacturasPage() {
   const [hasta, setHasta] = useState(new Date().toISOString().split("T")[0]);
   const [estado, setEstado] = useState("");
   const [facturaView, setFacturaView] = useState<Factura | null>(null);
+  const [pagoModal, setPagoModal] = useState<Factura | null>(null);
+  const [metodoPago, setMetodoPago] = useState("efectivo");
+  const [procesando, setProcesando] = useState(false);
   const [modoPrint, setModoPrint] = useState<"a4" | "termica">("a4");
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({ contentRef: printRef });
@@ -55,6 +58,24 @@ export default function FacturasPage() {
     else {
       const d = await res.json();
       alert(d.error || "Error al anular");
+    }
+  }
+
+  async function registrarPago() {
+    if (!pagoModal) return;
+    setProcesando(true);
+    const res = await fetch(`/api/facturas/${pagoModal.id}/pagar`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metodo_pago: metodoPago })
+    });
+    setProcesando(false);
+    if (res.ok) {
+      setPagoModal(null);
+      cargar();
+    } else {
+      const d = await res.json();
+      alert(d.error || "Error al registrar el pago");
     }
   }
 
@@ -164,6 +185,11 @@ export default function FacturasPage() {
                       <button className="btn btn-ghost" style={{ padding: "6px" }} onClick={() => setFacturaView(f)}>
                         <ChevronDown size={16} />
                       </button>
+                      {f.estado === "pendiente" && isAdmin && (
+                        <button className="btn btn-ghost" style={{ padding: "6px", color: "var(--success)" }} onClick={() => setPagoModal(f)} title="Registrar Pago">
+                          <CheckCircle size={16} />
+                        </button>
+                      )}
                       {isAdmin && f.estado !== "anulada" && (
                         <button className="btn btn-ghost" style={{ padding: "6px", color: "var(--danger)" }} onClick={() => anular(f.id)}>
                           <XCircle size={16} />
@@ -201,6 +227,30 @@ export default function FacturasPage() {
 
             <div className="card" style={{ background: "#f8fafc", padding: "40px", overflow: "auto", maxHeight: 500 }}>
               <PrintInvoice ref={printRef} data={toInvoiceData(facturaView)} modo={modoPrint} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Registrar Pago */}
+      {pagoModal && (
+        <div className="modal-overlay">
+          <div className="card" style={{ maxWidth: 400, width: "100%", padding: 32 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 8 }}>Registrar Pago</h2>
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 24 }}>Se cambiará el estado de la factura <b>{pagoModal.ncf}</b> a pagada.</p>
+            
+            <label className="label">Método de Pago Final</label>
+            <select className="input" value={metodoPago} onChange={e => setMetodoPago(e.target.value)}>
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+
+            <div style={{ display: "flex", gap: 12, marginTop: 24 }}>
+              <button className="btn btn-ghost" onClick={() => setPagoModal(null)} style={{ flex: 1 }}>Cancelar</button>
+              <button className="btn btn-primary" onClick={registrarPago} disabled={procesando} style={{ flex: 1 }}>
+                {procesando ? "Procesando..." : "Confirmar Pago"}
+              </button>
             </div>
           </div>
         </div>

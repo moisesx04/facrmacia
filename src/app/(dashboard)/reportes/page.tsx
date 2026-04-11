@@ -10,6 +10,8 @@ import { es } from "date-fns/locale";
 interface Resumen {
   total_facturas: number;
   total_ventas: number;
+  total_cobrado: number;
+  cuentas_por_cobrar: number;
   total_itbis: number;
   total_descuentos: number;
   por_metodo_pago: Record<string, number>;
@@ -87,9 +89,9 @@ export default function ReportesPage() {
                 <DollarSign size={24} color="#10b981" />
               </div>
               <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>
-                RD${resumen.total_ventas.toLocaleString()}
+                RD${resumen.total_cobrado?.toLocaleString() || "0"}
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Total Ventas Brutas</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Ingreso Real (Cobrado)</div>
             </div>
 
             <div className="card" style={{ padding: 24 }}>
@@ -105,9 +107,9 @@ export default function ReportesPage() {
                 <TrendingUp size={24} color="#f59e0b" />
               </div>
               <div style={{ fontSize: 24, fontWeight: 900, color: "#0f172a" }}>
-                RD${resumen.total_facturas > 0 ? (resumen.total_ventas / resumen.total_facturas).toLocaleString() : "0.00"}
+                RD${resumen.cuentas_por_cobrar?.toLocaleString() || "0"}
               </div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Ticket Promedio</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#64748b", textTransform: "uppercase" }}>Cuentas X Cobrar (Fiao)</div>
             </div>
 
             <div className="card" style={{ padding: 24 }}>

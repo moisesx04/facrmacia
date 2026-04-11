@@ -56,6 +56,8 @@ export async function GET(request: NextRequest) {
   const resumen = {
     total_facturas: data?.length || 0,
     total_ventas: data?.reduce((s, f) => s + Number(f.total), 0) || 0,
+    total_cobrado: data?.filter((f) => f.estado === "pagada").reduce((s, f) => s + Number(f.total), 0) || 0,
+    cuentas_por_cobrar: data?.filter((f) => f.estado === "pendiente").reduce((s, f) => s + Number(f.total), 0) || 0,
     total_itbis: data?.reduce((s, f) => s + Number(f.itbis_total), 0) || 0,
     total_descuentos: data?.reduce((s, f) => s + Number(f.descuento), 0) || 0,
     por_metodo_pago: data?.reduce((acc, f) => {

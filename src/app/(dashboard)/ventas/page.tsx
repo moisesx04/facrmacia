@@ -26,6 +26,8 @@ export default function VentasPage() {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState("");
   const [facturaActual, setFacturaActual] = useState<InvoiceData | null>(null);
+  const [modalManual, setModalManual] = useState(false);
+  const [manualItem, setManualItem] = useState({ nombre: "", precio: "" });
   const printRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({ contentRef: printRef });
@@ -58,6 +60,22 @@ export default function VentasPage() {
     });
   }
 
+  function agregarProductoManual() {
+    if (!manualItem.nombre || Number(manualItem.precio) <= 0) return;
+    const itemManual: Producto = {
+       id: "manual-" + Date.now(),
+       codigo: "MANUAL",
+       nombre: manualItem.nombre,
+       precio: Number(manualItem.precio),
+       itbis: 0.18,
+       aplica_itbis: aplicarItbis,
+       stock_actual: 9999
+    };
+    agregarProducto(itemManual);
+    setModalManual(false);
+    setManualItem({ nombre: "", precio: "" });
+  }
+
   function cambiarCantidad(id: string, delta: number) { setCart((prev) => prev.map((i) => i.id === id ? { ...i, cantidad: Math.max(1, Math.min(i.cantidad + delta, i.stock_actual)) } : i)); }
   function removeItem(id: string) { setCart((prev) => prev.filter((i) => i.id !== id)); }
 
@@ -67,7 +85,7 @@ export default function VentasPage() {
   const ncfActual = ncfSecuencias.find((n) => n.tipo === ncfTipo);
   const ncfAgotado = ncfActual && ncfActual.secuencia_actual > ncfActual.secuencia_fin;
 
-  async function procesarVenta(estado: "pagada") {
+  async function procesarVenta(estado: "pagada" | "pendiente") {
     if (cart.length === 0) { setError("El carrito está vacío"); return; }
     if (!clienteId) { setError("Seleccione un cliente"); return; }
     if (ncfAgotado) { setError("Secuencia NCF agotada"); return; }
@@ -96,9 +114,14 @@ export default function VentasPage() {
       <div className="pos-container">
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ position: "relative" }}>
-            <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
-            <input className="input" placeholder="Buscar por código de barras o nombre..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ paddingLeft: 44, padding: "16px 16px 16px 44px", fontSize: 16, background: "white", borderRadius: 8, boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }} />
+          <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
+              <input className="input" placeholder="Buscar por código de barras o nombre..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ paddingLeft: 44, padding: "16px 16px 16px 44px", fontSize: 16, background: "white", borderRadius: 8, boxShadow: "0 1px 2px rgba(0,0,0,0.02)" }} />
+            </div>
+            <button className="btn btn-outline hover-lift" onClick={() => setModalManual(true)} style={{ height: 56, background: "white", fontWeight: 700, padding: "0 24px" }}>
+              <Plus size={16} /> Artículo Manual
+            </button>
           </div>
 
           <div className="card" style={{ overflow: "hidden" }}>
@@ -197,8 +220,8 @@ export default function VentasPage() {
                  ⚠️ Debe configurar o asignar secuencias NCF para {NCF_LABELS[ncfTipo]} en Configuración.
                </div>
              )}
-             <button className="btn btn-primary" style={{ height: 44, width: "100%", fontSize: 14 }} onClick={() => procesarVenta("pagada")} disabled={cargando || !ncfActual || ncfActual.secuencia_actual > ncfActual.secuencia_fin || cart.length === 0}>
-               {cargando ? "Procesando..." : `Cobrar RD$${total.toLocaleString()}`}
+             <button className="btn btn-primary shadow-sm hover-lift" style={{ height: 44, width: "100%", fontSize: 14 }} onClick={() => procesarVenta(metodoPago === "credito" ? "pendiente" : "pagada")} disabled={cargando || !ncfActual || ncfActual.secuencia_actual > ncfActual.secuencia_fin || cart.length === 0}>
+               {cargando ? "Procesando..." : (metodoPago === "credito" ? `Fiar RD$${total.toLocaleString()}` : `Cobrar RD$${total.toLocaleString()}`)}
              </button>
            </div>
         </div>
@@ -215,6 +238,28 @@ export default function VentasPage() {
               <button className="btn btn-outline" onClick={() => setFacturaActual(null)}>Nueva Venta</button>
             </div>
             <div style={{ display: "none" }}><PrintInvoice ref={printRef} data={facturaActual} modo="termica" /></div>
+          </div>
+        </div>
+      )}
+
+      {modalManual && (
+        <div className="modal-overlay">
+          <div className="card" style={{ maxWidth: 400, width: "100%", padding: 32 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 900, marginBottom: 24, letterSpacing: "-0.02em" }}>Agregar Artículo Libre</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+               <div>
+                  <label className="label">Descripción Personalizada</label>
+                  <input className="input" value={manualItem.nombre} onChange={e => setManualItem({...manualItem, nombre: e.target.value})} placeholder="Ej. Empaque Extra" />
+               </div>
+               <div>
+                  <label className="label">Precio Unitario (RD$)</label>
+                  <input className="input" type="number" min="0" step="any" value={manualItem.precio} onChange={e => setManualItem({...manualItem, precio: e.target.value})} placeholder="0.00" />
+               </div>
+               <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                  <button className="btn btn-ghost" onClick={() => setModalManual(false)} style={{ flex: 1 }}>Cancelar</button>
+                  <button className="btn btn-primary" onClick={agregarProductoManual} disabled={!manualItem.nombre || Number(manualItem.precio) <= 0} style={{ flex: 1 }}>Añadir al Ticket</button>
+               </div>
+            </div>
           </div>
         </div>
       )}
