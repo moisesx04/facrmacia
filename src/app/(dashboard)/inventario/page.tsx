@@ -135,8 +135,16 @@ export default function InventarioPage() {
     }
   }
 
-  // ---- CSV Import ----
-  function parseCSV(text: string) {
+  // ---- File Import (CSV & TXT) ----
+  function parseFileContent(text: string, fileName: string) {
+    const isTxt = fileName.toLowerCase().endsWith(".txt");
+    if (isTxt) {
+      return text.split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(nombre => ({ nombre }));
+    }
+
     const lines = text.trim().split("\n");
     if (lines.length < 2) return [];
     const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/\s+/g, "_"));
@@ -157,7 +165,7 @@ export default function InventarioPage() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const text = ev.target?.result as string;
-      const rows = parseCSV(text);
+      const rows = parseFileContent(text, file.name);
       if (rows.length === 0) {
         setImportError("El archivo no tiene datos válidos o el formato es incorrecto.");
         setImportPreview([]);
@@ -178,30 +186,35 @@ export default function InventarioPage() {
     reader.onload = async (ev) => {
       try {
         const text = ev.target?.result as string;
-        const rows = parseCSV(text);
+        const rows = parseFileContent(text, importFile.name);
 
-        const productos = rows.map((row: any) => ({
-          codigo: row.codigo || row.sku || "",
-          nombre: row.nombre || row.name || row.producto || "",
-          precio: parseFloat(row.precio || row.price || "0") || 0,
-          costo: parseFloat(row.costo || row.cost || "0") || 0,
-          itbis: parseFloat(row.itbis || "0.18") || 0.18,
-          aplica_itbis: (row.aplica_itbis || "true").toLowerCase() !== "false",
-          stock_actual: parseInt(row.stock_actual || row.stock || "0") || 0,
-          stock_minimo: parseInt(row.stock_minimo || "5") || 5,
-          activo: true,
-        })).filter((p: any) => p.nombre.length > 0);
+        const productosParaImportar = rows.map((row: any) => {
+          // Si es TXT solo viene 'nombre', generamos el resto
+          const isFromTxt = !row.codigo && !row.sku;
+          const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
+          
+          return {
+            codigo: row.codigo || row.sku || `IMP-${randomSuffix}`,
+            nombre: row.nombre || "",
+            precio: parseFloat(row.precio || "0") || 0,
+            costo: parseFloat(row.costo || "0") || 0,
+            itbis: parseFloat(row.itbis || "0.18") || 0.18,
+            aplica_itbis: row.aplica_itbis !== undefined ? (row.aplica_itbis.toString().toLowerCase() !== "false") : true,
+            stock_actual: parseInt(row.stock_actual || "0") || 0,
+            stock_minimo: parseInt(row.stock_minimo || "5") || 5,
+            activo: true,
+          };
+        }).filter((p: any) => p.nombre.length > 0);
 
-        if (productos.length === 0) {
-          setImportError("No se encontraron productos válidos. Verifica el formato del CSV.");
+        if (productosParaImportar.length === 0) {
+          setImportError("No se encontraron productos válidos.");
           setImportLoading(false);
           return;
         }
 
-        // Insert one by one (or batch if API supports it)
         let ok = 0;
         let fail = 0;
-        for (const p of productos) {
+        for (const p of productosParaImportar) {
           const res = await fetch("/api/productos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -481,16 +494,22 @@ export default function InventarioPage() {
 
             {/* Instrucciones */}
             <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, padding: 14, marginBottom: 16, fontSize: 13 }}>
-              <strong style={{ display: "block", marginBottom: 6 }}>Formato del archivo CSV:</strong>
-              <p style={{ margin: "0 0 8px", color: "var(--text-muted)" }}>
-                La primera fila debe ser el encabezado con las siguientes columnas (separadas por coma):
-              </p>
-              <code style={{ display: "block", background: "var(--card)", padding: "8px 12px", borderRadius: 6, fontSize: 12, color: "var(--accent)", whiteSpace: "nowrap", overflowX: "auto" }}>
-                codigo,nombre,precio,costo,stock_actual,stock_minimo,aplica_itbis
-              </code>
-              <p style={{ margin: "8px 0 0", color: "var(--text-muted)", fontSize: 12 }}>
-                Ejemplo: MED-001,Paracetamol 500mg,85,40,100,10,true
-              </p>
+              <div style={{ marginBottom: 12 }}>
+                <strong style={{ display: "block", marginBottom: 4 }}>Opción 1: Archivo de Texto (.txt)</strong>
+                <p style={{ margin: 0, color: "var(--text-muted)" }}>
+                  Sube un archivo donde cada línea sea el nombre de un producto. Se generarán códigos automáticos.
+                </p>
+              </div>
+              <hr style={{ border: 0, borderTop: "1px solid var(--border)", margin: "12px 0" }} />
+              <div>
+                <strong style={{ display: "block", marginBottom: 4 }}>Opción 2: Archivo CSV (.csv)</strong>
+                <p style={{ margin: "0 0 8px", color: "var(--text-muted)" }}>
+                  La primera fila debe ser el encabezado seguido de los datos:
+                </p>
+                <code style={{ display: "block", background: "var(--card)", padding: "8px 12px", borderRadius: 6, fontSize: 12, color: "var(--accent)", whiteSpace: "nowrap", overflowX: "auto" }}>
+                  codigo,nombre,precio,costo,stock_actual,stock_minimo,aplica_itbis
+                </code>
+              </div>
             </div>
 
             {/* File picker */}
@@ -502,11 +521,11 @@ export default function InventarioPage() {
               <p style={{ margin: "0 0 4px", fontWeight: 500 }}>
                 {importFile ? importFile.name : "Haz clic para seleccionar un archivo"}
               </p>
-              <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Solo archivos .csv</p>
+              <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Archivos .csv o .txt</p>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept=".csv,.txt"
                 style={{ display: "none" }}
                 onChange={handleFileChange}
               />
