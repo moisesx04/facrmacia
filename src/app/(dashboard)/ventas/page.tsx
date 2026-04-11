@@ -186,8 +186,8 @@ export default function VentasPage() {
                       <span style={{ position: "absolute", left: 7, top: "50%", transform: "translateY(-50%)", fontSize: 11, color: "var(--text-muted)" }}>RD$</span>
                       <input
                         type="number" min="0" step="any"
-                        value={item.precio}
-                        onChange={(e) => cambiarPrecio(item.id, parseFloat(e.target.value) || 0)}
+                        value={item.precio ?? ""}
+                        onChange={(e) => cambiarPrecio(item.id, e.target.value === "" ? (undefined as any) : parseFloat(e.target.value))}
                         style={{ width: "100%", padding: "4px 4px 4px 28px", fontSize: 12, border: `1px solid ${rebajado ? "var(--danger)" : "var(--border)"}`, borderRadius: 5, outline: "none", background: rebajado ? "#fff5f5" : "white" }}
                       />
                     </div>
@@ -222,9 +222,9 @@ export default function VentasPage() {
                <span style={{ flexShrink: 0 }}>Descuento (RD$)</span>
                <input
                  type="number" min="0" step="any"
-                 value={descuento || ""}
-                 placeholder="0"
-                 onChange={(e) => setDescuento(parseFloat(e.target.value) || 0)}
+                 value={descuento ?? ""}
+                 placeholder="0.00"
+                 onChange={(e) => setDescuento(e.target.value === "" ? (undefined as any) : parseFloat(e.target.value))}
                  style={{ width: 90, padding: "4px 8px", fontSize: 13, border: "1px solid var(--danger)", borderRadius: 5, outline: "none", textAlign: "right", color: "var(--danger)", background: descuentoVal > 0 ? "#fff5f5" : "white" }}
                />
              </div>

@@ -396,8 +396,8 @@ export default function InventarioPage() {
                     className="input"
                     type="number"
                     min={0}
-                    value={form.stock_minimo ?? 5}
-                    onChange={(e) => setForm({ ...form, stock_minimo: Number(e.target.value) })}
+                    value={form.stock_minimo ?? ""}
+                    onChange={(e) => setForm({ ...form, stock_minimo: e.target.value === "" ? (undefined as any) : parseInt(e.target.value) })}
                   />
                 </div>
               </div>
@@ -420,8 +420,8 @@ export default function InventarioPage() {
                     type="number"
                     min={0}
                     step="0.01"
-                    value={form.precio ?? 0}
-                    onChange={(e) => setForm({ ...form, precio: parseFloat(e.target.value) || 0 })}
+                    value={form.precio ?? ""}
+                    onChange={(e) => setForm({ ...form, precio: e.target.value === "" ? (undefined as any) : parseFloat(e.target.value) })}
                   />
                 </div>
                 <div>
@@ -431,8 +431,8 @@ export default function InventarioPage() {
                     type="number"
                     min={0}
                     step="0.01"
-                    value={form.costo ?? 0}
-                    onChange={(e) => setForm({ ...form, costo: parseFloat(e.target.value) || 0 })}
+                    value={form.costo ?? ""}
+                    onChange={(e) => setForm({ ...form, costo: e.target.value === "" ? (undefined as any) : parseFloat(e.target.value) })}
                   />
                 </div>
                 <div>
@@ -441,8 +441,8 @@ export default function InventarioPage() {
                     className="input"
                     type="number"
                     min={0}
-                    value={form.stock_actual ?? 0}
-                    onChange={(e) => setForm({ ...form, stock_actual: parseInt(e.target.value) || 0 })}
+                    value={form.stock_actual ?? ""}
+                    onChange={(e) => setForm({ ...form, stock_actual: e.target.value === "" ? (undefined as any) : parseInt(e.target.value) })}
                   />
                 </div>
               </div>
