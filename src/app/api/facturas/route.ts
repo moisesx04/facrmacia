@@ -35,20 +35,33 @@ export async function POST(request: NextRequest) {
   const db = supabaseAdmin();
   const body = await request.json();
 
+  // Separar items normales de items manuales (sin UUID válido)
+  const itemsDB = (body.items || []).map((item: any) => {
+    const isManual = typeof item.producto_id === "string" && item.producto_id.startsWith("manual-");
+    return {
+      producto_id: isManual ? null : item.producto_id,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+      itbis_unitario: item.itbis_unitario || 0,
+      subtotal: item.subtotal,
+      costo_unitario: item.costo_unitario || 0,
+    };
+  });
+
   const { data, error } = await db.rpc("create_invoice_process", {
-    p_ncf_tipo: body.ncf_tipo,
-    p_cliente_id: body.cliente_id,
-    p_usuario_id: body.usuario_id,
-    p_subtotal: body.subtotal,
+    p_ncf_tipo:    body.ncf_tipo,
+    p_cliente_id:  body.cliente_id,
+    p_usuario_id:  body.usuario_id,
+    p_subtotal:    body.subtotal,
     p_itbis_total: body.itbis_total,
-    p_descuento: body.descuento || 0,
-    p_total: body.total,
+    p_descuento:   body.descuento || 0,
+    p_total:       body.total,
     p_metodo_pago: body.metodo_pago,
-    p_estado: body.estado || "pagada",
-    p_notas: body.notas || "",
+    p_estado:      body.estado || "pagada",
+    p_notas:       body.notas || "",
     p_costo_total: body.costo_total || 0,
-    p_ganancia: body.ganancia || 0,
-    p_items: body.items,
+    p_ganancia:    body.ganancia || 0,
+    p_items:       itemsDB,
   });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
