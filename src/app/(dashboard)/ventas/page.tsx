@@ -185,13 +185,19 @@ export default function VentasPage() {
                    <select className="input" value={ncfTipo} onChange={(e) => setNcfTipo(e.target.value as NCFTipo)}>
                      {Object.entries(NCF_LABELS).map(([k, v]) => {
                        const act = ncfSecuencias.find((n) => n.tipo === k);
-                       return <option key={k} value={k} disabled={act && act.secuencia_actual > act.secuencia_fin}>{k}</option>;
+                       const disabled = !act || act.secuencia_actual > act.secuencia_fin;
+                       return <option key={k} value={k} disabled={disabled}>{disabled ? `${k} (Agotado/No Configurado)` : v}</option>;
                      })}
                    </select>
                 </div>
              </div>
              {error && <div style={{ color: "var(--danger)", fontSize: 13, fontWeight: 500, padding: "8px 12px", background: "#fee2e2", borderRadius: 6 }}>{error}</div>}
-             <button className="btn btn-primary" style={{ height: 44, width: "100%", fontSize: 14 }} onClick={() => procesarVenta("pagada")} disabled={cargando || ncfAgotado || cart.length === 0}>
+             {(!ncfActual || ncfActual.secuencia_actual > ncfActual.secuencia_fin) && (
+               <div style={{ color: "#d97706", fontSize: 13, fontWeight: 500, padding: "8px 12px", background: "#fef3c7", borderRadius: 6 }}>
+                 ⚠️ Debe configurar o asignar secuencias NCF para {NCF_LABELS[ncfTipo]} en Configuración.
+               </div>
+             )}
+             <button className="btn btn-primary" style={{ height: 44, width: "100%", fontSize: 14 }} onClick={() => procesarVenta("pagada")} disabled={cargando || !ncfActual || ncfActual.secuencia_actual > ncfActual.secuencia_fin || cart.length === 0}>
                {cargando ? "Procesando..." : `Cobrar RD$${total.toLocaleString()}`}
              </button>
            </div>

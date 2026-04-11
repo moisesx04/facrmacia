@@ -158,11 +158,19 @@ export default function ReportesPage() {
                 <br /><br />
                 Durante este tiempo se han procesado **{resumen.total_facturas}** transacciones legítimas. El ITBIS total acumulado por el fisco asciende a **RD${resumen.total_itbis.toLocaleString()}**.
               </p>
-              <div style={{ marginTop: 32, padding: 20, background: "white", borderRadius: 8, border: "1px solid var(--border)" }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, letterSpacing: "0.05em" }}>RENDIMIENTO PROMEDIO</div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)" }}>RD${(resumen.total_ventas / 30).toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: "var(--success)", fontWeight: 500, marginTop: 4 }}>↑ 12% COMPARADO CON MES ANTERIOR</div>
-              </div>
+              {(() => {
+                const d1 = new Date(desde);
+                const d2 = new Date(hasta);
+                const dias = Math.max(1, Math.round((d2.getTime() - d1.getTime()) / (1000 * 3600 * 24)) + 1);
+                const promedio = resumen.total_ventas / dias;
+                return (
+                  <div style={{ marginTop: 32, padding: 20, background: "white", borderRadius: 8, border: "1px solid var(--border)" }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, letterSpacing: "0.05em" }}>PROMEDIO DIARIO (En el período)</div>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)" }}>RD${promedio.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 500, marginTop: 4 }}>Basado en {dias} {dias === 1 ? "día" : "días"} seleccionados</div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </>
