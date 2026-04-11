@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Settings, RefreshCw, Plus, X, Calendar, Hash, FileCheck, Users, UserPlus, Shield, Lock } from "lucide-react";
+import { Settings, RefreshCw, Plus, X, Calendar, Hash, FileCheck, Users, UserPlus, Shield, Lock, Pencil } from "lucide-react";
 
 interface NCFSecuencia {
   id: string; tipo: string; prefix: string; secuencia_actual: number;
@@ -25,7 +25,7 @@ export default function ConfiguracionPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<"nuevo" | "nuevo_usuario" | null>(null);
   const [form, setForm] = useState(EMPTY_NCF);
-  const [formUsuario, setFormUsuario] = useState({ nombre: "", email: "", password: "", rol: "vendedor", currentAdminPassword: "" });
+  const [formUsuario, setFormUsuario] = useState({ id: "", nombre: "", email: "", password: "", rol: "vendedor", currentAdminPassword: "" });
   const [guardando, setGuardando] = useState<string | null>(null);
 
   async function cargar() {
@@ -50,20 +50,26 @@ export default function ConfiguracionPage() {
 
   async function crearUsuario() {
     setGuardando("usuario");
+    const isEdit = !!formUsuario.id;
     const res = await fetch("/api/usuarios", {
-      method: "POST",
+      method: isEdit ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formUsuario),
     });
     if (res.ok) {
        setModal(null);
-       setFormUsuario({ nombre: "", email: "", password: "", rol: "vendedor", currentAdminPassword: "" });
+       setFormUsuario({ id: "", nombre: "", email: "", password: "", rol: "vendedor", currentAdminPassword: "" });
        await cargar();
     } else {
        const err = await res.json();
-       alert(err.error || "Error al crear usuario");
+       alert(err.error || "Error al guardar usuario");
     }
     setGuardando(null);
+  }
+
+  function editarUsuario(user: any) {
+    setFormUsuario({ id: user.id, nombre: user.nombre, email: user.email, password: "", rol: user.rol, currentAdminPassword: "" });
+    setModal("nuevo_usuario");
   }
 
   useEffect(() => { cargar(); }, []);
@@ -193,7 +199,7 @@ export default function ConfiguracionPage() {
                  <p style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8" }}>ROLES Y ACCESOS DEL SISTEMA</p>
                </div>
             </div>
-            <button className="btn btn-primary hover-lift" onClick={() => setModal("nuevo_usuario")} style={{ height: 44, padding: "0 20px" }}>
+            <button className="btn btn-primary hover-lift" onClick={() => { setFormUsuario({ id: "", nombre: "", email: "", password: "", rol: "vendedor", currentAdminPassword: "" }); setModal("nuevo_usuario"); }} style={{ height: 44, padding: "0 20px" }}>
               <UserPlus size={18} /> NUEVO USUARIO
             </button>
           </div>
@@ -219,9 +225,14 @@ export default function ConfiguracionPage() {
                   </div>
                 </div>
                 <div>
-                  <span className={`badge ${user.rol === "admin" ? "badge-primary" : "badge-success"}`} style={{ textTransform: "uppercase" }}>
-                    {user.rol === "admin" ? "Administrador" : "Ventas"}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span className={`badge ${user.rol === "admin" ? "badge-primary" : "badge-success"}`} style={{ textTransform: "uppercase" }}>
+                      {user.rol === "admin" ? "Administrador" : "Ventas"}
+                    </span>
+                    <button className="btn btn-ghost" onClick={() => editarUsuario(user)} style={{ width: 32, height: 32, padding: 0, borderRadius: 8, color: "#94a3b8" }}>
+                      <Pencil size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -267,8 +278,8 @@ export default function ConfiguracionPage() {
               <div className="modal" style={{ maxWidth: 500 }}>
                  <div className="modal-header" style={{ marginBottom: 32 }}>
                     <div>
-                      <h2 style={{ fontSize: 24, fontWeight: 950, color: "#0f172a", letterSpacing: "-0.04em" }}>Nuevo Usuario</h2>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8" }}>ALTA DE PERSONAL</p>
+                      <h2 style={{ fontSize: 24, fontWeight: 950, color: "#0f172a", letterSpacing: "-0.04em" }}>{formUsuario.id ? "Editar Usuario" : "Nuevo Usuario"}</h2>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8" }}>{formUsuario.id ? "MODIFICACIÓN DE ACCESOS" : "ALTA DE PERSONAL"}</p>
                     </div>
                     <button onClick={() => setModal(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "#94a3b8" }}><X size={24} /></button>
                  </div>
@@ -291,7 +302,7 @@ export default function ConfiguracionPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="label">CONTRASEÑA INICIAL</label>
+                        <label className="label">CONTRASEÑA {formUsuario.id ? "(Dejar en blanco para no cambiar)" : "INICIAL"}</label>
                         <input className="input" type="password" value={formUsuario.password} onChange={(e) => setFormUsuario({ ...formUsuario, password: e.target.value })} style={{ height: 56 }} placeholder="******" />
                       </div>
                     </div>
@@ -310,8 +321,8 @@ export default function ConfiguracionPage() {
 
                  <div style={{ marginTop: 40, display: "flex", gap: 12 }}>
                     <button className="btn btn-ghost" onClick={() => setModal(null)} style={{ flex: 1, height: 56 }}>CANCELAR</button>
-                    <button className="btn btn-primary hover-lift" onClick={crearUsuario} disabled={guardando === "usuario" || !formUsuario.nombre || !formUsuario.email || !formUsuario.password || (formUsuario.rol === "admin" && !formUsuario.currentAdminPassword)} style={{ flex: 2, height: 56 }}>
-                       {guardando === "usuario" ? "CREANDO..." : "CREAR USUARIO"}
+                    <button className="btn btn-primary hover-lift" onClick={crearUsuario} disabled={guardando === "usuario" || !formUsuario.nombre || !formUsuario.email || (!formUsuario.id && !formUsuario.password) || (formUsuario.rol === "admin" && !formUsuario.currentAdminPassword)} style={{ flex: 2, height: 56 }}>
+                       {guardando === "usuario" ? "GUARDANDO..." : "GUARDAR"}
                     </button>
                  </div>
               </div>
