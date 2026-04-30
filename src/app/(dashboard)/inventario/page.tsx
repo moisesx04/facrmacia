@@ -43,6 +43,12 @@ export default function InventarioPage() {
   const [form, setForm] = useState<Partial<Producto>>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteModal, setBulkDeleteModal] = useState<{ open: boolean; loading: boolean; error: string }>({ open: false, loading: false, error: "" });
+
+  const toggleSelect = (id: string) => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleAll = () => setSelectedIds(prev => prev.size === productos.length ? new Set() : new Set(productos.map(p => p.id)));
+
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string; pass: string; error: string; loading: boolean }>({
     open: false, id: "", pass: "", error: "", loading: false,
   });
@@ -111,6 +117,20 @@ export default function InventarioPage() {
       setSaveError(e.message || "Error inesperado");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function eliminarBulk() {
+    setBulkDeleteModal(p => ({ ...p, loading: true, error: "" }));
+    try {
+      await Promise.all([...selectedIds].map(id =>
+        fetch(`/api/productos?id=${id}`, { method: "DELETE" })
+      ));
+      setSelectedIds(new Set());
+      setBulkDeleteModal({ open: false, loading: false, error: "" });
+      await cargar();
+    } catch (e: any) {
+      setBulkDeleteModal(p => ({ ...p, loading: false, error: e.message }));
     }
   }
 
@@ -263,6 +283,17 @@ export default function InventarioPage() {
 
   return (
     <div style={{ maxWidth: 1600, margin: "0 auto", paddingBottom: 60, paddingTop: 40 }}>
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 500, background: "#0f172a", color: "white", borderRadius: 14, padding: "14px 24px", display: "flex", alignItems: "center", gap: 20, boxShadow: "0 8px 32px rgba(0,0,0,0.35)", minWidth: 340 }}>
+          <span style={{ fontWeight: 700, fontSize: 14 }}>✔ {selectedIds.size} seleccionado{selectedIds.size > 1 ? "s" : ""}</span>
+          <button onClick={() => setSelectedIds(new Set())} style={{ background: "rgba(255,255,255,0.12)", border: "none", color: "white", borderRadius: 8, padding: "6px 14px", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>Cancelar</button>
+          <button onClick={() => setBulkDeleteModal({ open: true, loading: false, error: "" })} style={{ background: "#dc2626", border: "none", color: "white", borderRadius: 8, padding: "6px 16px", cursor: "pointer", fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+            <Trash2 size={14} /> Eliminar {selectedIds.size}
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 32 }}>
         <div>
@@ -314,6 +345,11 @@ export default function InventarioPage() {
           <table className="datagrid">
             <thead>
               <tr>
+                {isAdmin && (
+                  <th style={{ width: 40, textAlign: "center" }}>
+                    <input type="checkbox" checked={selectedIds.size === productos.length && productos.length > 0} onChange={toggleAll} style={{ cursor: "pointer", width: 16, height: 16 }} />
+                  </th>
+                )}
                 <th>SKU</th>
                 <th>Producto / Laboratorio</th>
                 <th>Precio</th>
@@ -342,7 +378,12 @@ export default function InventarioPage() {
                 const vencido = diffDias !== null && diffDias <= 0;
 
                 return (
-                  <tr key={p.id}>
+                  <tr key={p.id} style={{ background: selectedIds.has(p.id) ? "#eff6ff" : undefined }}>
+                    {isAdmin && (
+                      <td style={{ textAlign: "center" }}>
+                        <input type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} style={{ cursor: "pointer", width: 16, height: 16 }} />
+                      </td>
+                    )}
                     <td style={{ color: "var(--text-muted)", fontSize: 13 }}>{p.codigo}</td>
                     <td>
                       <div style={{ fontWeight: 600 }}>{p.nombre}</div>
@@ -629,6 +670,30 @@ export default function InventarioPage() {
                 disabled={!importFile || importLoading}
               >
                 {importLoading ? "Importando..." : "Importar Datos"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== MODAL: ELIMINAR MÚLTIPLE ===== */}
+      {bulkDeleteModal.open && (
+        <div style={overlayStyle}>
+          <div style={{ ...modalBoxStyle, maxWidth: 400 }}>
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(239,68,68,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                <Trash2 size={24} color="var(--danger)" />
+              </div>
+              <h2 style={{ margin: "0 0 6px", fontSize: 18, fontWeight: 700 }}>¿Eliminar {selectedIds.size} producto{selectedIds.size > 1 ? "s" : ""} ?</h2>
+              <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14 }}>Esta acción los desactivará del catálogo. No se puede deshacer.</p>
+            </div>
+            {bulkDeleteModal.error && (
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid var(--danger)", borderRadius: 8, padding: "10px 14px", color: "var(--danger)", fontSize: 13, marginBottom: 12 }}>{bulkDeleteModal.error}</div>
+            )}
+            <div style={{ display: "flex", gap: 10 }}>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => setBulkDeleteModal({ open: false, loading: false, error: "" })} disabled={bulkDeleteModal.loading}>Cancelar</button>
+              <button className="btn btn-primary" style={{ flex: 1, background: "var(--danger)", borderColor: "var(--danger)" }} onClick={eliminarBulk} disabled={bulkDeleteModal.loading}>
+                {bulkDeleteModal.loading ? "Eliminando..." : `Eliminar ${selectedIds.size}`}
               </button>
             </div>
           </div>
