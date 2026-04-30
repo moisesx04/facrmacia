@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import {
   LayoutDashboard, ShoppingCart, Package, Users, FileText,
   BarChart3, Settings, LogOut, Pill, Menu, X
@@ -25,12 +25,12 @@ const navItems = [
   { href: "/configuracion", icon: Settings, label: "Configuración", roles: ["admin"] },
 ];
 
-export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
+export default memo(function Sidebar({ role, userName, userEmail }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    setIsOpen(false);
+    if (isOpen) setIsOpen(false);
   }, [pathname]);
 
   const filtered = navItems.filter((item) => item.roles.includes(role));
@@ -48,10 +48,10 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
 
       {/* Sidebar Container */}
       <aside className={`sidebar ${isOpen ? "open" : ""}`} style={{ 
-        width: 280, /* Increased width slightly */
+        width: 280,
         height: '100vh',
         background: "#ffffff",
-        borderRight: "2px solid var(--border)", /* Thicker border */
+        borderRight: "2px solid var(--border)",
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -78,7 +78,8 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
             return (
               <Link key={item.href} href={item.href} style={{
                 display: "flex", alignItems: "center", gap: 14, padding: "14px 18px",
-                textDecoration: "none", borderRadius: 10, transition: "all 0.2s ease",
+                textDecoration: "none", borderRadius: 10, 
+                transition: "background-color 0.2s, border-color 0.2s, color 0.2s",
                 background: active ? "#eff6ff" : "transparent",
                 border: active ? "2px solid var(--primary)" : "2px solid transparent",
                 color: active ? "var(--primary)" : "#334155"
@@ -114,7 +115,7 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
             width: "100%", justifyContent: "center", background: "white", 
             border: "1px solid #e2e8f0", color: "#ef4444", borderRadius: 8, height: 40,
             fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 8, transition: "all 0.2s"
+            display: 'flex', alignItems: 'center', gap: 8, transition: "background-color 0.2s, border-color 0.2s"
           }} 
           onMouseOver={(e) => { e.currentTarget.style.background = "#fef2f2"; e.currentTarget.style.borderColor = "#fecaca"; }}
           onMouseOut={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "#e2e8f0"; }}
@@ -125,4 +126,4 @@ export default function Sidebar({ role, userName, userEmail }: SidebarProps) {
       </aside>
     </>
   );
-}
+});

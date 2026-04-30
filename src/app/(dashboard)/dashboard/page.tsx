@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { TrendingUp, ShoppingBag, AlertTriangle, FileText, Package, ShoppingCart, Users, Zap, CheckCircle } from "lucide-react";
@@ -142,7 +142,7 @@ export default function DashboardPage() {
   );
 }
 
-function MetricCard({ title, value, loading, isWarning }: any) {
+const MetricCard = memo(function MetricCard({ title, value, loading, isWarning }: any) {
   return (
     <div className="card" style={{ padding: 24 }}>
       <div style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, marginBottom: 8 }}>{title}</div>
@@ -155,11 +155,11 @@ function MetricCard({ title, value, loading, isWarning }: any) {
       )}
     </div>
   );
-}
+});
 
-function ShortcutCard({ href, icon, title, desc }: any) {
+const ShortcutCard = memo(function ShortcutCard({ href, icon, title, desc }: any) {
   return (
-    <Link href={href} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", color: "inherit", transition: "all 0.15s" }}
+    <Link href={href} style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: 16, border: "1px solid var(--border)", borderRadius: 8, textDecoration: "none", color: "inherit", transition: "border-color 0.15s" }}
       onMouseOver={(e) => (e.currentTarget.style.borderColor = "var(--text-main)")}
       onMouseOut={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
     >
@@ -172,6 +172,6 @@ function ShortcutCard({ href, icon, title, desc }: any) {
       </div>
     </Link>
   );
-}
+});
 
 function Plus({size}: {size: number}) { return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> }
