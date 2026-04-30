@@ -19,8 +19,9 @@ export async function GET(request: NextRequest) {
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  if (desde) query = query.gte("created_at", desde);
-  if (hasta) query = query.lte("created_at", hasta + "T23:59:59");
+  // Usar timestamps completos en UTC-4 (hora RD) para evitar mezcla de días
+  if (desde) query = query.gte("created_at", `${desde}T00:00:00-04:00`);
+  if (hasta) query = query.lte("created_at", `${hasta}T23:59:59-04:00`);
   if (estado) query = query.eq("estado", estado);
 
   const { data, error } = await query;

@@ -14,14 +14,19 @@ export async function GET(request: NextRequest) {
   const hasta = searchParams.get("hasta") || new Date().toISOString().split("T")[0];
   const formato = searchParams.get("formato") || "json";
 
+  // Convertir fechas YYYY-MM-DD a timestamps completos en UTC-4 (hora RD)
+  // Esto evita que ventas de días distintos se mezclen por diferencia de zona horaria
+  const desdeISO = `${desde}T00:00:00-04:00`;
+  const hastaISO = `${hasta}T23:59:59-04:00`;
+
   const { data, error } = await db
     .from("facturas")
     .select(`id, ncf, ncf_tipo, subtotal, itbis_total, descuento, total, metodo_pago, estado, created_at, ganancia,
       clientes(nombre, cedula_rnc),
       usuarios!usuario_id(nombre),
       factura_items(cantidad, precio_unitario, subtotal, productos(nombre, codigo))`)
-    .gte("created_at", desde)
-    .lte("created_at", hasta + "T23:59:59")
+    .gte("created_at", desdeISO)
+    .lte("created_at", hastaISO)
     .neq("estado", "anulada")
     .order("created_at", { ascending: false });
 

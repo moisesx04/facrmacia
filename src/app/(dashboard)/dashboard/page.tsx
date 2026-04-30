@@ -36,12 +36,16 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const hoy = new Date().toISOString().split("T")[0];
-        const inicioMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0];
+        // Calcular fechas en hora local de RD (UTC-4) para que "hoy" sea correcto
+        const ahora = new Date();
+        const hoy = ahora.toLocaleDateString("en-CA", { timeZone: "America/Santo_Domingo" }); // YYYY-MM-DD
+        const inicioMes = new Date(ahora.toLocaleString("en-US", { timeZone: "America/Santo_Domingo" }));
+        inicioMes.setDate(1);
+        const inicioMesStr = inicioMes.toLocaleDateString("en-CA", { timeZone: "America/Santo_Domingo" });
 
         const [resHoy, resMes, resAlertas, resTotal] = await Promise.all([
           fetch(`/api/reportes?desde=${hoy}&hasta=${hoy}`).then((r) => r.json()),
-          fetch(`/api/reportes?desde=${inicioMes}&hasta=${hoy}`).then((r) => r.json()),
+          fetch(`/api/reportes?desde=${inicioMesStr}&hasta=${hoy}`).then((r) => r.json()),
           fetch("/api/productos?bajo_stock=true&limit=10").then((r) => r.json()),
           fetch("/api/productos?limit=1").then((r) => r.json()),
         ]);
